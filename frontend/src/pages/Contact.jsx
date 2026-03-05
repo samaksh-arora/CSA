@@ -7,7 +7,7 @@ const SOCIALS = [
     title: 'Email',
     description: "Reach out directly and we'll get back to you within 24 hours.",
     handle: 'csa.wsu@gmail.com',
-    href: 'mailto:csa.wsu@gmail.com',
+    href: 'mailto:waynestatecsa@gmail.com',
     color: 'primary',
   },
   {
@@ -15,7 +15,7 @@ const SOCIALS = [
     title: 'Discord',
     description: 'Join our server for real-time announcements, help channels, and community chat.',
     handle: 'discord.gg/wsu-csa',
-    href: 'https://discord.gg/wsu-csa',
+    href: 'https://discord.gg/JS8qaGrSJ',
     color: 'secondary',
   },
   {
@@ -23,7 +23,7 @@ const SOCIALS = [
     title: 'LinkedIn',
     description: 'Follow us for job postings, member spotlights, and professional updates.',
     handle: '@WSU-CSA',
-    href: 'https://linkedin.com',
+    href: 'https://www.linkedin.com/in/wayne-state-computer-science-association-495ba93b3/',
     color: 'accent',
   },
   {
@@ -33,14 +33,6 @@ const SOCIALS = [
     handle: '@wsu_csa',
     href: 'https://instagram.com/wsu_csa',
     color: 'info',
-  },
-  {
-    icon: FaGithub,
-    title: 'GitHub',
-    description: 'Explore our open-source club projects and contribute to the codebase.',
-    handle: 'github.com/wsu-csa',
-    href: 'https://github.com',
-    color: 'primary',
   },
 ];
 
@@ -64,7 +56,7 @@ const Contact = () => {
       </section>
 
       {/* ── Socials ── */}
-      <section className="container mx-auto px-4 sm:px-6 py-20 max-w-5xl">
+      <section className="container mx-auto px-4 sm:px-6 py-20 max-w-3xl">
         <div className="text-center mb-12">
           <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-3">
             // find us here
@@ -72,31 +64,9 @@ const Contact = () => {
           <h2 className="text-3xl font-bold text-base-content">Connect With Us</h2>
         </div>
 
-        {/* Row 1 — 3 cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
-          {SOCIALS.slice(0, 3).map(({ icon: Icon, title, description, handle, href, color }) => (
-            <a
-              key={title}
-              href={href}
-              target={href.startsWith('mailto') ? '_self' : '_blank'}
-              rel="noopener noreferrer"
-              className="group block bg-base-100 border border-base-300 hover:border-primary rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className={`w-12 h-12 bg-${color}/10 group-hover:bg-${color}/20 rounded-xl flex items-center justify-center mb-4 transition-colors`}>
-                <Icon className={`w-5 h-5 text-${color}`} />
-              </div>
-              <h3 className="text-lg font-bold text-base-content mb-1">{title}</h3>
-              <p className="text-sm text-base-content/60 leading-relaxed mb-4">{description}</p>
-              <span className={`text-sm font-mono font-semibold text-${color} group-hover:underline`}>
-                {handle} →
-              </span>
-            </a>
-          ))}
-        </div>
-
-        {/* Row 2 — 2 cards centered */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
-          {SOCIALS.slice(3).map(({ icon: Icon, title, description, handle, href, color }) => (
+        {/* 2x2 Symmetrical Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {SOCIALS.map(({ icon: Icon, title, description, handle, href, color }) => (
             <a
               key={title}
               href={href}
@@ -130,7 +100,7 @@ const Contact = () => {
             Whether you have a question or just want to get involved — we'd love to hear from you.
           </p>
           <a
-            href="mailto:csa.wsu@gmail.com"
+            href="mailto:waynestatecsa@gmail.com"
             className="btn btn-lg bg-primary-content text-primary hover:bg-primary-content/90 border-none font-semibold"
           >
             Send Us an Email

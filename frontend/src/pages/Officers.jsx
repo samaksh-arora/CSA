@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaLinkedin, FaEnvelope, FaUser } from 'react-icons/fa';
-import samakshimg from '../assets/samakshimg.jpg';
+import { FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
 const OFFICERS = [
   {
@@ -9,8 +8,6 @@ const OFFICERS = [
     name: 'Samaksh Arora',
     position: 'President',
     year: 'Sophomore',
-    image: samakshimg,
-    objectPosition: 'center center',
     bio: 'Founder and President of CSA.',
     linkedin: '',
     email: '',
@@ -20,8 +17,6 @@ const OFFICERS = [
     name: 'Ayanah Ahmed',
     position: 'Vice President',
     year: 'Sophomore',
-    image: samakshimg,
-    objectPosition: 'center top',
     bio: 'Passionate about building inclusive tech communities.',
     linkedin: '',
     email: '',
@@ -31,8 +26,6 @@ const OFFICERS = [
     name: 'Ben Curd',
     position: 'Treasurer',
     year: 'Sophomore',
-    image: samakshimg,
-    objectPosition: 'center center',
     bio: 'Driving innovation in CSA.',
     linkedin: '',
     email: '',
@@ -42,37 +35,49 @@ const OFFICERS = [
     name: 'Ridhima Jain',
     position: 'External Relations',
     year: 'Sophomore',
-    image: samakshimg,
-    objectPosition: 'center center',
     bio: 'Connecting CSA with industry partners and opportunities.',
     linkedin: '',
     email: '',
   },
+  {
+    id: 5,
+    name: 'James Najor',
+    position: 'Membership Chair',
+    year: 'Freshman',
+    bio: 'Managing Member Data in CSA',
+    linkedin: '',
+    email: '',
+  },
+   {
+    id: 6,
+    name: 'James Latsletter',
+    position: 'Project Manager',
+    year: 'Freshman',
+    bio: 'Choosing skilled Candidates for Projects and leading innovation',
+    linkedin: '',
+    email: '',
+  },
+   {
+    id: 7,
+    name: 'Shanmucka Javvaji',
+    position: 'Membership Chair',
+    year: 'Sophomore',
+    bio: 'Managing Member Data in CSA',
+    linkedin: '',
+    email: '',
+  }
 ];
 
-// Fallback shown when image is missing or fails to load
-const OfficerImage = ({ src, name, objectPosition }) => {
-  const [errored, setErrored] = useState(false);
+const getInitials = (name) =>
+  name.split(' ').map(n => n[0]).join('').toUpperCase();
 
-  if (errored || !src) {
-    return (
-      <div className="w-full h-full bg-base-200 flex flex-col items-center justify-center gap-2">
-        <FaUser className="w-12 h-12 text-base-content/20" />
-        <span className="text-xs text-base-content/30 font-mono">{name}</span>
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={src}
-      alt={name}
-      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-      style={{ objectPosition }}
-      onError={() => setErrored(true)}
-    />
-  );
-};
+// Consistent color per officer based on name
+const AVATAR_COLORS = [
+  'bg-primary/20 text-primary',
+  'bg-secondary/20 text-secondary',
+  'bg-accent/20 text-accent',
+  'bg-info/20 text-info',
+];
 
 const Officers = () => {
   return (
@@ -96,31 +101,28 @@ const Officers = () => {
       {/* ── Officers Grid ── */}
       <section className="container mx-auto px-4 sm:px-6 py-16 sm:py-20 max-w-6xl">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {OFFICERS.map((officer) => (
+          {OFFICERS.map((officer, index) => (
             <div
               key={officer.id}
               className="group bg-base-100 border border-base-300 hover:border-primary rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
-              {/* Photo */}
-              <div className="relative overflow-hidden aspect-square">
-                <OfficerImage
-                  src={officer.image}
-                  name={officer.name}
-                  objectPosition={officer.objectPosition}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-base-300/60 via-transparent to-transparent pointer-events-none" />
-
-                {/* Position badge */}
-                <div className="absolute bottom-3 left-3">
-                  <span className="badge badge-primary badge-sm font-semibold shadow-lg">
-                    {officer.position}
+              {/* Avatar */}
+              <div className={`flex items-center justify-center py-10 ${AVATAR_COLORS[index % AVATAR_COLORS.length]}`}>
+                <div className="w-20 h-20 rounded-2xl bg-base-100/30 flex items-center justify-center">
+                  <span className="text-3xl font-bold tracking-tight">
+                    {getInitials(officer.name)}
                   </span>
                 </div>
               </div>
 
               {/* Info */}
               <div className="p-5">
-                <h2 className="text-lg font-bold text-base-content mb-0.5">{officer.name}</h2>
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <h2 className="text-lg font-bold text-base-content">{officer.name}</h2>
+                </div>
+                <span className="badge badge-primary badge-sm font-semibold mb-1">
+                  {officer.position}
+                </span>
                 <p className="text-xs text-base-content/50 font-mono mb-3">{officer.year}</p>
                 {officer.bio && (
                   <p className="text-sm text-base-content/65 leading-relaxed mb-4">
@@ -128,7 +130,6 @@ const Officers = () => {
                   </p>
                 )}
 
-                {/* Social links — only rendered if values are provided */}
                 {(officer.linkedin || officer.email) && (
                   <div className="flex gap-2 pt-3 border-t border-base-300">
                     {officer.linkedin && (

@@ -78,9 +78,9 @@ const Join = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
             <FaUserPlus className="text-3xl text-white" />
           </div>
-          <h1 className="text-4xl font-bold mb-2">Join GSCMA</h1>
+          <h1 className="text-4xl font-bold mb-2">Join CSA</h1>
           <p className="text-base-content/70">
-            Become a member and start your journey in supply chain excellence
+            Become a member and start your journey in Computer Science excellence
           </p>
         </div>
 
@@ -226,7 +226,7 @@ const Join = () => {
                     name="major"
                     value={formData.major}
                     onChange={handleChange}
-                    placeholder="e.g., Supply Chain Management"
+                    placeholder="e.g., Computer Science"
                     className="input input-bordered w-full pl-10"
                     required
                   />
@@ -310,11 +310,7 @@ const Join = () => {
         </div>
 
         {/* Footer Note */}
-        <div className="text-center mt-6">
-          <p className="text-xs text-base-content/50">
-            By creating an account, you agree to GSCMA's Terms of Service and Privacy Policy
-          </p>
-        </div>
+        
       </div>
     </div>
   );

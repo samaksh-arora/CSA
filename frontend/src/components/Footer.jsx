@@ -11,13 +11,13 @@ const Footer = () => {
       </div> 
       <div>
         <div className="grid grid-flow-col gap-4">
-          <a href="https://www.linkedin.com/groups/6572845/" target="_blank" rel="noopener noreferrer">
+          <a href="http://www.linkedin.com/in/wayne-state-computer-science-association-495ba93b3" target="_blank" rel="noopener noreferrer">
             <FaLinkedin className="w-6 h-6 hover:text-primary cursor-pointer transition-colors" />
           </a> 
           <a href="https://instagram.com/wsu_csa" target="_blank" rel="noopener noreferrer">
             <FaInstagram className="w-6 h-6 hover:text-secondary cursor-pointer transition-colors" />
           </a> 
-          <a href="https://instagram.com/wsu_csa" target="_blank" rel="noopener noreferrer">
+          <a href="https://discord.gg/JS8qaGrSJ" target="_blank" rel="noopener noreferrer">
             <FaDiscord className="w-6 h-6 hover:text-secondary cursor-pointer transition-colors" />
           </a> 
         

@@ -5,7 +5,7 @@ import { FaCode, FaTerminal, FaUsers, FaBriefcase, FaCalendarAlt } from 'react-i
 import Cubes from '../components/Cubes';
 
 const WHAT_WE_DO = [
-  'Host technical workshops and coding sessions',
+  'Provide real world experience to strengthen resumes',
   'Organize hackathons and programming competitions',
   'Facilitate networking with software engineers and recruiters',
   'Run resume reviews and mock interview prep',

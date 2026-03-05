@@ -49,7 +49,7 @@ const Login = () => {
           </div>
           <h1 className="text-4xl font-bold mb-2">Welcome Back</h1>
           <p className="text-base-content/70">
-            Sign in to access your GSCMA member account
+            Sign in to access your CSA member account
           </p>
         </div>
 
