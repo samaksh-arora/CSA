@@ -46,7 +46,7 @@ const Members = () => {
     <div className="container mx-auto px-4 py-16">
       <div className="mb-8">
         <h1 className="text-5xl font-bold mb-4">Our Members</h1>
-        <p className="text-lg mb-6">Connect with fellow GSCMA members at Wayne State University</p>
+        <p className="text-lg mb-6">Connect with fellow CSA members at Wayne State University</p>
         
         <div className="form-control max-w-md">
           <input

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import EventCard from '../components/EventCard';
+import { FaPlus, FaTimes, FaCalendarAlt } from 'react-icons/fa';
 
 const Events = () => {
   const { currentUser, userRole, getToken } = useAuth();
@@ -10,16 +11,11 @@ const Events = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    date: '',
-    time: '',
-    location: '',
-    description: ''
+    name: '', date: '', time: '', location: '', description: ''
   });
 
   const isAdmin = userRole === 'admin';
 
-  // Fetch all events
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -28,44 +24,35 @@ const Events = () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/events`);
       setEvents(response.data);
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching events:', error);
+    } finally {
       setLoading(false);
     }
   };
 
-  // Handle form input changes
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle create/edit event submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = await getToken();
       if (editingEvent) {
-        // Update existing event
         await axios.put(
           `${import.meta.env.VITE_API_URL}/events/${editingEvent._id}`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
-        // Create new event
         await axios.post(
           `${import.meta.env.VITE_API_URL}/events`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       }
-      setShowModal(false);
-      setEditingEvent(null);
-      setFormData({ name: '', date: '', time: '', location: '', description: '' });
+      closeModal();
       fetchEvents();
     } catch (error) {
       console.error('Error saving event:', error);
@@ -73,24 +60,21 @@ const Events = () => {
     }
   };
 
-  // Handle event deletion
   const handleDelete = async (eventId) => {
-    if (window.confirm('Are you sure you want to delete this event?')) {
-      try {
-        const token = await getToken();
-        await axios.delete(
-          `${import.meta.env.VITE_API_URL}/events/${eventId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        fetchEvents();
-      } catch (error) {
-        console.error('Error deleting event:', error);
-        alert('Failed to delete event.');
-      }
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
+    try {
+      const token = await getToken();
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/events/${eventId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchEvents();
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      alert('Failed to delete event.');
     }
   };
 
-  // Handle edit button click
   const handleEdit = (event) => {
     setEditingEvent(event);
     setFormData({
@@ -103,145 +87,158 @@ const Events = () => {
     setShowModal(true);
   };
 
-  // Open modal for creating new event
   const openCreateModal = () => {
     setEditingEvent(null);
     setFormData({ name: '', date: '', time: '', location: '', description: '' });
     setShowModal(true);
   };
 
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingEvent(null);
+    setFormData({ name: '', date: '', time: '', location: '', description: '' });
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg"></span>
+      <div className="min-h-screen flex items-center justify-center bg-base-100">
+        <div className="text-center">
+          <span className="loading loading-spinner loading-lg text-primary" />
+          <p className="mt-4 text-base-content/60 font-mono text-sm">// loading events...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-      {/* Header Section - Mobile Optimized */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <div className="flex-1">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 sm:mb-4">
-            Upcoming Events
-          </h1>
-          <p className="text-base sm:text-lg text-base-content/70">
-            Join us for exciting events and networking opportunities
-          </p>
+    <div className="min-h-screen bg-base-100">
+
+      {/* ── Hero ── */}
+      <section className="bg-base-200 border-b border-base-300 py-16 sm:py-20">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+            <div>
+              <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-3">
+                // events
+              </span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-base-content tracking-tight mb-3">
+                Upcoming Events
+              </h1>
+              <p className="text-base sm:text-lg text-base-content/65 max-w-xl">
+                Workshops, hackathons, tech talks, and networking — stay plugged in to what's happening at CSA.
+              </p>
+            </div>
+            {isAdmin && (
+              <button
+                className="btn btn-primary gap-2 shrink-0 w-full sm:w-auto"
+                onClick={openCreateModal}
+              >
+                <FaPlus className="w-3.5 h-3.5" />
+                Create Event
+              </button>
+            )}
+          </div>
         </div>
-        {isAdmin && (
-          <button 
-            className="btn btn-primary btn-sm sm:btn-md w-full sm:w-auto shadow-lg"
-            onClick={openCreateModal}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            <span className="hidden sm:inline">Create Event</span>
-            <span className="inline sm:hidden">New Event</span>
-          </button>
+      </section>
+
+      {/* ── Events Grid ── */}
+      <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-6xl">
+        {events.length === 0 ? (
+          <div className="text-center py-24">
+            <div className="w-16 h-16 bg-base-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <FaCalendarAlt className="w-7 h-7 text-base-content/30" />
+            </div>
+            <p className="text-base-content/50 font-mono text-sm mb-1">// no events found</p>
+            <p className="text-base-content/40 text-sm">Check back soon for upcoming workshops and events.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {events.map((event) => (
+              <EventCard
+                key={event._id}
+                event={event}
+                isAdmin={isAdmin}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+              />
+            ))}
+          </div>
         )}
-      </div>
+      </section>
 
-      {/* Events Grid - Mobile Optimized */}
-      {events.length === 0 ? (
-        <div className="text-center py-12 sm:py-16 px-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 sm:h-20 sm:w-20 mx-auto mb-4 text-base-content/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p className="text-lg sm:text-xl text-base-content/60">
-            No events scheduled at the moment. Check back soon!
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {events.map((event) => (
-            <EventCard
-              key={event._id}
-              event={event}
-              isAdmin={isAdmin}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Create/Edit Event Modal - Mobile Optimized */}
+      {/* ── Create / Edit Modal ── */}
       {showModal && (
         <div className="modal modal-open">
-          {/* Modal backdrop with improved touch target */}
-          <div 
-            className="modal-backdrop bg-black/50" 
-            onClick={() => setShowModal(false)}
-          />
-          
-          {/* Modal box with responsive sizing */}
-          <div className="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+          <div className="modal-box w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto border border-base-300 p-0">
+
             {/* Modal Header */}
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h3 className="font-bold text-xl sm:text-2xl">
-                {editingEvent ? 'Edit Event' : 'Create New Event'}
-              </h3>
+            <div className="flex items-center justify-between px-6 py-5 border-b border-base-300">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-widest text-primary block mb-0.5">
+                  {editingEvent ? '// edit' : '// new event'}
+                </span>
+                <h3 className="font-bold text-xl text-base-content">
+                  {editingEvent ? 'Edit Event' : 'Create Event'}
+                </h3>
+              </div>
               <button
                 type="button"
-                onClick={() => setShowModal(false)}
-                className="btn btn-sm btn-circle btn-ghost"
+                onClick={closeModal}
+                className="btn btn-sm btn-ghost btn-circle"
                 aria-label="Close modal"
               >
-                ✕
+                <FaTimes className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Form with mobile-optimized inputs */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+
               {/* Event Name */}
               <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-base">Event Name</span>
-                  <span className="label-text-alt text-error">*</span>
+                <label className="label pb-1">
+                  <span className="label-text font-semibold">Event Name</span>
+                  <span className="label-text-alt text-error">required</span>
                 </label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="input input-bordered w-full focus:input-primary text-base"
-                  placeholder="e.g., Supply Chain Workshop"
+                  className="input input-bordered w-full focus:input-primary"
+                  placeholder="e.g., Intro to React Workshop"
                   required
                   autoComplete="off"
                 />
               </div>
 
-              {/* Date and Time - Responsive Grid */}
+              {/* Date + Time */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold text-base">Date</span>
-                    <span className="label-text-alt text-error">*</span>
+                  <label className="label pb-1">
+                    <span className="label-text font-semibold">Date</span>
+                    <span className="label-text-alt text-error">required</span>
                   </label>
                   <input
                     type="date"
                     name="date"
                     value={formData.date}
                     onChange={handleInputChange}
-                    className="input input-bordered w-full focus:input-primary text-base"
+                    className="input input-bordered w-full focus:input-primary"
                     required
                   />
                 </div>
-
                 <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold text-base">Time</span>
-                    <span className="label-text-alt text-error">*</span>
+                  <label className="label pb-1">
+                    <span className="label-text font-semibold">Time</span>
+                    <span className="label-text-alt text-error">required</span>
                   </label>
                   <input
                     type="time"
                     name="time"
                     value={formData.time}
                     onChange={handleInputChange}
-                    className="input input-bordered w-full focus:input-primary text-base"
+                    className="input input-bordered w-full focus:input-primary"
                     required
                   />
                 </div>
@@ -249,17 +246,17 @@ const Events = () => {
 
               {/* Location */}
               <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-base">Location</span>
-                  <span className="label-text-alt text-error">*</span>
+                <label className="label pb-1">
+                  <span className="label-text font-semibold">Location</span>
+                  <span className="label-text-alt text-error">required</span>
                 </label>
                 <input
                   type="text"
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
-                  className="input input-bordered w-full focus:input-primary text-base"
-                  placeholder="e.g., Student Center Room 101"
+                  className="input input-bordered w-full focus:input-primary"
+                  placeholder="e.g., Engineering Building Room 2100"
                   required
                   autoComplete="off"
                 />
@@ -267,44 +264,45 @@ const Events = () => {
 
               {/* Description */}
               <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-base">Description</span>
-                  <span className="label-text-alt text-error">*</span>
+                <label className="label pb-1">
+                  <span className="label-text font-semibold">Description</span>
+                  <span className="label-text-alt text-error">required</span>
                 </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  className="textarea textarea-bordered w-full focus:textarea-primary text-base leading-relaxed min-h-[120px]"
-                  placeholder="Describe your event..."
-                  rows="5"
+                  className="textarea textarea-bordered w-full focus:textarea-primary leading-relaxed min-h-[120px]"
+                  placeholder="What will attendees learn or do at this event?"
+                  rows={5}
                   required
                 />
-                <label className="label">
-                  <span className="label-text-alt text-base-content/60">
+                <label className="label pt-1">
+                  <span className="label-text-alt text-base-content/40 font-mono">
                     {formData.description.length} characters
                   </span>
                 </label>
               </div>
 
-              {/* Modal Actions - Mobile Optimized */}
-              <div className="modal-action mt-6 flex-col sm:flex-row gap-2 sm:gap-3">
-                <button 
-                  type="button" 
-                  className="btn btn-ghost w-full sm:w-auto order-2 sm:order-1"
-                  onClick={() => setShowModal(false)}
+              {/* Actions */}
+              <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2 border-t border-base-300">
+                <button
+                  type="button"
+                  className="btn btn-ghost w-full sm:w-auto"
+                  onClick={closeModal}
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary w-full sm:w-auto order-1 sm:order-2"
+                <button
+                  type="submit"
+                  className="btn btn-primary w-full sm:w-auto sm:ml-auto"
                 >
-                  {editingEvent ? 'Update Event' : 'Create Event'}
+                  {editingEvent ? 'Save Changes' : 'Create Event'}
                 </button>
               </div>
             </form>
           </div>
+          <div className="modal-backdrop" onClick={closeModal} />
         </div>
       )}
     </div>

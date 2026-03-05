@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { FaUsers, FaCalendarAlt, FaMoneyBillWave, FaUserShield, FaSearch, FaTimes, FaEye, FaEdit, FaTrash, FaUserCog, FaFileExcel, FaDownload } from 'react-icons/fa';
+import {
+  FaUsers, FaCalendarAlt, FaUserShield, FaSearch,
+  FaTimes, FaEye, FaEdit, FaTrash, FaUserCog,
+  FaFileExcel, FaDownload, FaCode
+} from 'react-icons/fa';
 import { exportMembersToExcel, exportAttendeesToExcel } from '../utils/exportToExcel';
 
 const AdminDashboard = () => {
@@ -14,19 +18,14 @@ const AdminDashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventAttendees, setEventAttendees] = useState([]);
   const [showAttendeesModal, setShowAttendeesModal] = useState(false);
-  
+
   // Edit event state
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [editFormData, setEditFormData] = useState({
-    name: '',
-    date: '',
-    time: '',
-    location: '',
-    description: ''
+    name: '', date: '', time: '', location: '', description: ''
   });
 
-  // Fetch dashboard data
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -44,9 +43,9 @@ const AdminDashboard = () => {
       ]);
       setUsers(usersRes.data);
       setEvents(eventsRes.data);
-      setLoading(false);
     } catch (error) {
-      console.error('Error fetching dashboard ', error);
+      console.error('Error fetching dashboard:', error);
+    } finally {
       setLoading(false);
     }
   };
@@ -68,45 +67,27 @@ const AdminDashboard = () => {
   };
 
   const filteredUsers = users.filter(user => {
-    const searchLower = searchTerm.toLowerCase();
+    const s = searchTerm.toLowerCase();
     return (
-      user.firstName.toLowerCase().includes(searchLower) ||
-      user.lastName.toLowerCase().includes(searchLower) ||
-      user.email.toLowerCase().includes(searchLower) ||
-      user.major.toLowerCase().includes(searchLower) ||
-      user.graduationYear.toString().includes(searchLower)
+      user.firstName?.toLowerCase().includes(s) ||
+      user.lastName?.toLowerCase().includes(s) ||
+      user.email?.toLowerCase().includes(s) ||
+      user.major?.toLowerCase().includes(s) ||
+      user.graduationYear?.toString().includes(s)
     );
   });
 
-  const togglePaymentStatus = async (userId, currentStatus) => {
+  const toggleUserRole = async (userId, currentRole) => {
+    const newRole = currentRole === 'admin' ? 'member' : 'admin';
+    if (!window.confirm(`Change this user's role to ${newRole}?`)) return;
     try {
       const token = await getToken();
-      const newStatus = currentStatus === 'paid' ? 'not_paid' : 'paid';
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/users/${userId}/payment`,
-        { paymentStatus: newStatus },
+        `${import.meta.env.VITE_API_URL}/users/${userId}/role`,
+        { role: newRole },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchDashboardData();
-    } catch (error) {
-      console.error('Error updating payment status:', error);
-      alert('Failed to update payment status.');
-    }
-  };
-
-  const toggleUserRole = async (userId, currentRole) => {
-    try {
-      const token = await getToken();
-      const newRole = currentRole === 'admin' ? 'member' : 'admin';
-      
-      if (window.confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
-        await axios.put(
-          `${import.meta.env.VITE_API_URL}/users/${userId}/role`,
-          { role: newRole },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        fetchDashboardData();
-      }
     } catch (error) {
       console.error('Error updating user role:', error);
       alert('Failed to update user role.');
@@ -114,50 +95,39 @@ const AdminDashboard = () => {
   };
 
   const deleteUser = async (userId, userEmail) => {
+    if (!window.confirm(`Delete user ${userEmail}? This cannot be undone.`)) return;
     try {
-      if (window.confirm(`Are you sure you want to delete user ${userEmail}? This action cannot be undone.`)) {
-        const token = await getToken();
-        await axios.delete(
-          `${import.meta.env.VITE_API_URL}/users/${userId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        fetchDashboardData();
-      }
+      const token = await getToken();
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/users/${userId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchDashboardData();
     } catch (error) {
       console.error('Error deleting user:', error);
       alert('Failed to delete user.');
     }
   };
 
-  // Edit Event Functions
   const handleEditEvent = (event) => {
     setEditingEvent(event);
-    
-    // Format date for input (YYYY-MM-DD)
-    const formattedDate = new Date(event.date).toISOString().split('T')[0];
-    
     setEditFormData({
       name: event.name,
-      date: formattedDate,
+      date: new Date(event.date).toISOString().split('T')[0],
       time: event.time,
       location: event.location,
       description: event.description
     });
-    
     setShowEditModal(true);
   };
 
   const handleEditFormChange = (e) => {
     const { name, value } = e.target;
-    setEditFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setEditFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSaveEdit = async (e) => {
     e.preventDefault();
-    
     try {
       const token = await getToken();
       await axios.put(
@@ -165,139 +135,78 @@ const AdminDashboard = () => {
         editFormData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
       alert('Event updated successfully!');
       setShowEditModal(false);
       setEditingEvent(null);
       fetchDashboardData();
     } catch (error) {
       console.error('Error updating event:', error);
-      alert('Failed to update event. Please try again.');
+      alert('Failed to update event.');
     }
   };
 
   const handleCancelEdit = () => {
     setShowEditModal(false);
     setEditingEvent(null);
-    setEditFormData({
-      name: '',
-      date: '',
-      time: '',
-      location: '',
-      description: ''
-    });
+    setEditFormData({ name: '', date: '', time: '', location: '', description: '' });
   };
 
-  // Delete Event Function
   const handleDeleteEvent = async (eventId, eventName) => {
-    if (window.confirm(`Are you sure you want to delete "${eventName}"? This action cannot be undone.`)) {
-      try {
-        const token = await getToken();
-        await axios.delete(
-          `${import.meta.env.VITE_API_URL}/events/${eventId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        alert('Event deleted successfully!');
-        fetchDashboardData();
-      } catch (error) {
-        console.error('Error deleting event:', error);
-        alert('Failed to delete event. Please try again.');
-      }
+    if (!window.confirm(`Delete "${eventName}"? This cannot be undone.`)) return;
+    try {
+      const token = await getToken();
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/events/${eventId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      alert('Failed to delete event.');
     }
   };
 
-  // Export functions
-  const handleExportMembers = () => {
-    const success = exportMembersToExcel(filteredUsers);
-    if (success) {
-      alert(`Successfully exported ${filteredUsers.length} members to Excel!`);
-    } else {
-      alert('Failed to export members. Please try again.');
-    }
-  };
-
-  const handleExportAttendees = () => {
-    const success = exportAttendeesToExcel(eventAttendees, selectedEvent);
-    if (success) {
-      alert(`Successfully exported ${eventAttendees.length} attendees to Excel!`);
-    } else {
-      alert('Failed to export attendees. Please try again.');
-    }
-  };
+  const stats = [
+    { title: 'Total Members', value: users.length, icon: FaUsers, color: 'primary' },
+    { title: 'Total Events', value: events.length, icon: FaCalendarAlt, color: 'secondary' },
+    { title: 'Admins', value: users.filter(u => u.role === 'admin').length, icon: FaUserShield, color: 'accent' },
+    { title: 'Upcoming', value: events.filter(e => new Date(e.date) >= new Date()).length, icon: FaCode, color: 'info' },
+  ];
 
   if (loading) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen bg-gradient-to-br from-base-200 to-base-300">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-        <p className="mt-4 text-base-content/70">Loading dashboard...</p>
+      <div className="min-h-screen flex items-center justify-center bg-base-200">
+        <div className="text-center">
+          <span className="loading loading-spinner loading-lg text-primary" />
+          <p className="mt-4 text-base-content/60 font-mono text-sm">// loading dashboard...</p>
+        </div>
       </div>
     );
   }
 
-  const paidMembers = users.filter(u => u.paymentStatus === 'paid').length;
-  const totalMembers = users.length;
-  const adminCount = users.filter(u => u.role === 'admin').length;
-
-  const stats = [
-    {
-      title: 'Total Users',
-      value: totalMembers,
-      description: 'Registered users',
-      icon: FaUsers,
-      color: 'primary',
-      bgColor: 'bg-primary/10',
-    },
-    {
-      title: 'Paid Members',
-      value: paidMembers,
-      description: `${totalMembers - paidMembers} pending`,
-      icon: FaMoneyBillWave,
-      color: 'success',
-      bgColor: 'bg-success/10',
-    },
-    {
-      title: 'Admins',
-      value: adminCount,
-      description: 'Admin users',
-      icon: FaUserShield,
-      color: 'secondary',
-      bgColor: 'bg-secondary/10',
-    },
-    {
-      title: 'Total Events',
-      value: events.length,
-      description: 'Scheduled events',
-      icon: FaCalendarAlt,
-      color: 'info',
-      bgColor: 'bg-info/10',
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200 py-12">
-      <div className="container mx-auto px-4">
-        {/* Header */}
+    <div className="min-h-screen bg-base-200">
+      <div className="container mx-auto px-4 sm:px-6 py-10 max-w-7xl">
+
+        {/* ── Header ── */}
         <div className="mb-8">
-          <h1 className="text-5xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Admin Dashboard
-          </h1>
-          <p className="text-base-content/70">Manage users, events, and organization settings</p>
+          <span className="text-xs font-mono uppercase tracking-widest text-primary">// admin</span>
+          <h1 className="text-4xl font-bold text-base-content mt-1">Admin Dashboard</h1>
+          <p className="text-base-content/60 mt-1">Manage members, events, and roles</p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <div key={stat.title} className="card bg-base-100 shadow-lg border border-base-300 hover:border-primary/50 transition-all hover:-translate-y-1">
-              <div className="card-body">
+        {/* ── Stats ── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {stats.map(({ title, value, icon: Icon, color }) => (
+            <div key={title} className="card bg-base-100 border border-base-300 hover:border-primary/50 transition-all hover:-translate-y-1 shadow-sm">
+              <div className="card-body p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-base-content/60 font-medium">{stat.title}</p>
-                    <p className={`text-4xl font-bold text-${stat.color} mt-2`}>{stat.value}</p>
-                    <p className="text-xs text-base-content/50 mt-1">{stat.description}</p>
+                    <p className="text-xs text-base-content/50 font-medium uppercase tracking-wide">{title}</p>
+                    <p className={`text-3xl font-bold text-${color} mt-1`}>{value}</p>
                   </div>
-                  <div className={`${stat.bgColor} p-4 rounded-2xl`}>
-                    <stat.icon className={`text-3xl text-${stat.color}`} />
+                  <div className={`w-10 h-10 bg-${color}/10 rounded-xl flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 text-${color}`} />
                   </div>
                 </div>
               </div>
@@ -305,431 +214,296 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        {/* Tabs */}
-        <div className="tabs tabs-boxed bg-base-100 shadow-lg mb-6 p-2 border border-base-300">
+        {/* ── Tabs ── */}
+        <div className="tabs tabs-boxed bg-base-100 border border-base-300 p-1 mb-6 w-fit rounded-xl">
           <button
-            className={`tab tab-lg flex-1 gap-2 ${activeTab === 'users' ? 'tab-active' : ''}`}
+            className={`tab gap-2 rounded-lg transition-all ${activeTab === 'users' ? 'tab-active' : ''}`}
             onClick={() => setActiveTab('users')}
           >
-            <FaUserCog />
-            User Management
+            <FaUserCog className="w-4 h-4" /> User Management
           </button>
           <button
-            className={`tab tab-lg flex-1 gap-2 ${activeTab === 'events' ? 'tab-active' : ''}`}
+            className={`tab gap-2 rounded-lg transition-all ${activeTab === 'events' ? 'tab-active' : ''}`}
             onClick={() => setActiveTab('events')}
           >
-            <FaCalendarAlt />
-            Events
+            <FaCalendarAlt className="w-4 h-4" /> Event Management
           </button>
         </div>
 
-        {/* Users Table */}
+        {/* ── Users Tab ── */}
         {activeTab === 'users' && (
-          <div className="card bg-base-100 shadow-xl border border-base-300">
-            <div className="card-body">
-              {/* Search Bar & Export Button */}
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                <div>
-                  <h2 className="card-title text-2xl text-primary flex items-center gap-2">
-                    <FaUsers />
-                    User Management
-                  </h2>
-                  <p className="text-sm text-base-content/60 mt-1">
-                    Manage member accounts and permissions
-                  </p>
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  {/* Export Button */}
-                  <button
-                    className="btn btn-success gap-2"
-                    onClick={handleExportMembers}
-                    disabled={filteredUsers.length === 0}
-                  >
-                    <FaFileExcel />
-                    Export to Excel ({filteredUsers.length})
-                  </button>
-                  
-                  {/* Search */}
-                  <div className="form-control">
-                    <div className="input-group">
-                      <input
-                        type="text"
-                        placeholder="Search by name, email, major..."
-                        className="input input-bordered input-primary w-full md:w-80"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                      {searchTerm ? (
-                        <button 
-                          className="btn btn-square btn-primary"
-                          onClick={() => setSearchTerm('')}
-                        >
-                          <FaTimes />
-                        </button>
-                      ) : (
-                        <button className="btn btn-square btn-primary">
-                          <FaSearch />
-                        </button>
-                      )}
-                    </div>
+          <div className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body p-4 sm:p-6">
+              {/* Toolbar */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+                <h2 className="text-xl font-bold text-base-content">Members</h2>
+                <div className="flex flex-wrap gap-2">
+                  <div className="relative">
+                    <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40 w-3.5 h-3.5" />
+                    <input
+                      type="text"
+                      placeholder="Search members..."
+                      className="input input-bordered input-sm pl-9 w-56"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                   </div>
+                  <button
+                    className="btn btn-sm btn-outline gap-2"
+                    onClick={() => exportMembersToExcel(users)}
+                  >
+                    <FaFileExcel className="w-3.5 h-3.5" /> Export
+                  </button>
                 </div>
               </div>
-              
-              {searchTerm && (
-                <div className="alert alert-info shadow-lg mb-4">
-                  <FaSearch />
-                  <span>
-                    Showing <strong>{filteredUsers.length}</strong> of <strong>{users.length}</strong> users matching "{searchTerm}"
-                  </span>
-                  <button 
-                    className="btn btn-sm btn-ghost"
-                    onClick={() => setSearchTerm('')}
-                  >
-                    Clear
-                  </button>
-                </div>
-              )}
 
-              <div className="overflow-x-auto">
-                <table className="table table-zebra w-full">
-                  <thead>
-                    <tr className="bg-base-200">
-                      <th className="font-bold">Name</th>
-                      <th className="font-bold">Email</th>
-                      <th className="font-bold">Major</th>
-                      <th className="font-bold">Year</th>
-                      <th className="font-bold">Role</th>
-                      <th className="font-bold">Payment</th>
-                      <th className="font-bold text-center">Actions</th>
+              {/* Table */}
+              <div className="overflow-x-auto rounded-xl border border-base-300">
+                <table className="table table-sm">
+                  <thead className="bg-base-200">
+                    <tr>
+                      <th>Member</th>
+                      <th>Major</th>
+                      <th>Grad Year</th>
+                      <th>Role</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredUsers.map((user) => (
-                      <tr key={user._id} className="hover:bg-base-200/50">
-                        <td className="font-semibold">{user.firstName} {user.lastName}</td>
-                        <td className="text-sm">{user.email}</td>
-                        <td>{user.major}</td>
-                        <td>{user.graduationYear}</td>
+                    {filteredUsers.map(user => (
+                      <tr key={user._id} className="hover">
                         <td>
-                          <div className={`badge badge-lg ${user.role === 'admin' ? 'badge-secondary' : 'badge-primary'}`}>
-                            {user.role === 'admin' && <FaUserShield className="mr-1" />}
+                          <div className="flex items-center gap-3">
+                            <div className="avatar">
+                              <div className="w-8 rounded-full">
+                                <img
+                                  src={`https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random&bold=true`}
+                                  alt={user.firstName}
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <p className="font-semibold text-sm">{user.firstName} {user.lastName}</p>
+                              <p className="text-xs text-base-content/50">{user.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="text-sm text-base-content/70">{user.major}</td>
+                        <td className="text-sm text-base-content/70">{user.graduationYear}</td>
+                        <td>
+                          <div className={`badge gap-1 ${user.role === 'admin' ? 'badge-primary' : 'badge-ghost'}`}>
+                            {user.role === 'admin' && <FaUserShield className="w-3 h-3" />}
                             {user.role}
                           </div>
                         </td>
                         <td>
-                          <div className={`badge badge-lg ${user.paymentStatus === 'paid' ? 'badge-success' : 'badge-warning'}`}>
-                            {user.paymentStatus === 'paid' ? '✓ Paid' : 'Pending'}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="flex gap-2 justify-center flex-wrap">
+                          <div className="flex gap-1">
                             <button
-                              className="btn btn-xs btn-success gap-1"
-                              onClick={() => togglePaymentStatus(user._id, user.paymentStatus)}
-                              title="Toggle Payment Status"
-                            >
-                              <FaMoneyBillWave />
-                              Payment
-                            </button>
-                            <button
-                              className="btn btn-xs btn-info gap-1"
+                              className="btn btn-xs btn-outline gap-1"
                               onClick={() => toggleUserRole(user._id, user.role)}
-                              title="Toggle Role"
+                              title="Toggle role"
                             >
-                              <FaUserShield />
-                              Role
+                              <FaUserCog className="w-3 h-3" />
+                              {user.role === 'admin' ? 'Demote' : 'Promote'}
                             </button>
                             <button
-                              className="btn btn-xs btn-error gap-1"
+                              className="btn btn-xs btn-error btn-outline"
                               onClick={() => deleteUser(user._id, user.email)}
-                              title="Delete User"
+                              title="Delete user"
                             >
-                              <FaTrash />
-                              Delete
+                              <FaTrash className="w-3 h-3" />
                             </button>
                           </div>
                         </td>
                       </tr>
                     ))}
+                    {filteredUsers.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="text-center py-8 text-base-content/40 font-mono text-sm">
+                          // no members found
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
-                
-                {filteredUsers.length === 0 && (
-                  <div className="text-center py-12">
-                    <FaSearch className="text-6xl text-base-content/20 mx-auto mb-4" />
-                    <p className="text-base-content/60 text-lg">No users found matching your search.</p>
-                    <button 
-                      className="btn btn-primary btn-sm mt-4"
-                      onClick={() => setSearchTerm('')}
-                    >
-                      Clear Search
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Events Table */}
+        {/* ── Events Tab ── */}
         {activeTab === 'events' && (
-          <div className="card bg-base-100 shadow-xl border border-base-300">
-            <div className="card-body">
-              <div className="mb-6">
-                <h2 className="card-title text-2xl text-primary flex items-center gap-2">
-                  <FaCalendarAlt />
-                  Event Management
-                </h2>
-                <p className="text-sm text-base-content/60 mt-1">
-                  View and manage organization events
-                </p>
+          <div className="card bg-base-100 border border-base-300 shadow-sm">
+            <div className="card-body p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-base-content">Events</h2>
+                <button
+                  className="btn btn-sm btn-outline gap-2"
+                  onClick={() => exportAttendeesToExcel(events)}
+                >
+                  <FaDownload className="w-3.5 h-3.5" /> Export
+                </button>
               </div>
-              <div className="overflow-x-auto">
-                <table className="table table-zebra w-full">
-                  <thead>
-                    <tr className="bg-base-200">
-                      <th className="font-bold">Event Name</th>
-                      <th className="font-bold">Date</th>
-                      <th className="font-bold">Time</th>
-                      <th className="font-bold">Location</th>
-                      <th className="font-bold text-center">Attendees</th>
-                      <th className="font-bold text-center">Actions</th>
+
+              <div className="overflow-x-auto rounded-xl border border-base-300">
+                <table className="table table-sm">
+                  <thead className="bg-base-200">
+                    <tr>
+                      <th>Event</th>
+                      <th>Date</th>
+                      <th>Location</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {events.map((event) => (
-                      <tr key={event._id} className="hover:bg-base-200/50">
-                        <td className="font-semibold">{event.name}</td>
-                        <td>{new Date(event.date).toLocaleDateString('en-US', { 
-                          weekday: 'short', 
-                          month: 'short', 
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}</td>
-                        <td>{event.time}</td>
-                        <td>{event.location}</td>
-                        <td className="text-center">
-                          <button 
-                            className="badge badge-info badge-lg cursor-pointer hover:badge-primary transition-colors gap-1"
-                            onClick={() => fetchEventAttendees(event._id, event.name)}
-                          >
-                            <FaUsers />
-                            {event.attendees?.length || 0}
-                          </button>
-                        </td>
+                    {events.map(event => (
+                      <tr key={event._id} className="hover">
                         <td>
-                          <div className="flex gap-2 justify-center flex-wrap">
-                            <button 
-                              className="btn btn-xs btn-info gap-1"
+                          <p className="font-semibold text-sm">{event.name}</p>
+                          <p className="text-xs text-base-content/50 line-clamp-1">{event.description}</p>
+                        </td>
+                        <td className="text-sm text-base-content/70">
+                          {new Date(event.date).toLocaleDateString()} {event.time && `• ${event.time}`}
+                        </td>
+                        <td className="text-sm text-base-content/70">{event.location}</td>
+                        <td>
+                          <div className="flex gap-1">
+                            <button
+                              className="btn btn-xs btn-outline gap-1"
                               onClick={() => fetchEventAttendees(event._id, event.name)}
                             >
-                              <FaEye />
-                              View
+                              <FaEye className="w-3 h-3" /> Attendees
                             </button>
-                            <button 
-                              className="btn btn-xs btn-primary gap-1"
+                            <button
+                              className="btn btn-xs btn-outline gap-1"
                               onClick={() => handleEditEvent(event)}
                             >
-                              <FaEdit />
-                              Edit
+                              <FaEdit className="w-3 h-3" /> Edit
                             </button>
-                            <button 
-                              className="btn btn-xs btn-error gap-1"
+                            <button
+                              className="btn btn-xs btn-error btn-outline"
                               onClick={() => handleDeleteEvent(event._id, event.name)}
                             >
-                              <FaTrash />
-                              Delete
+                              <FaTrash className="w-3 h-3" />
                             </button>
                           </div>
                         </td>
                       </tr>
                     ))}
+                    {events.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="text-center py-8 text-base-content/40 font-mono text-sm">
+                          // no events found
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Edit Event Modal */}
-        {showEditModal && (
-          <div className="modal modal-open">
-            <div className="modal-box max-w-2xl">
-              <h3 className="font-bold text-2xl text-primary mb-6 flex items-center gap-2">
-                <FaEdit />
-                Edit Event
-              </h3>
-              
-              <form onSubmit={handleSaveEdit}>
-                <div className="space-y-4">
-                  {/* Event Name */}
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Event Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={editFormData.name}
-                      onChange={handleEditFormChange}
-                      className="input input-bordered input-primary"
-                      required
-                    />
-                  </div>
-
-                  {/* Date and Time */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text font-semibold">Date</span>
-                      </label>
-                      <input
-                        type="date"
-                        name="date"
-                        value={editFormData.date}
-                        onChange={handleEditFormChange}
-                        className="input input-bordered input-primary"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text font-semibold">Time</span>
-                      </label>
-                      <input
-                        type="time"
-                        name="time"
-                        value={editFormData.time}
-                        onChange={handleEditFormChange}
-                        className="input input-bordered input-primary"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Location */}
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Location</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="location"
-                      value={editFormData.location}
-                      onChange={handleEditFormChange}
-                      className="input input-bordered input-primary"
-                      required
-                    />
-                  </div>
-
-                  {/* Description */}
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Description</span>
-                    </label>
-                    <textarea
-                      name="description"
-                      value={editFormData.description}
-                      onChange={handleEditFormChange}
-                      className="textarea textarea-bordered textarea-primary h-32"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="modal-action">
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={handleCancelEdit}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary gap-2"
-                  >
-                    <FaEdit />
-                    Save Changes
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Event Attendees Modal */}
-        {showAttendeesModal && (
-          <div className="modal modal-open">
-            <div className="modal-box max-w-4xl">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="font-bold text-2xl text-primary flex items-center gap-2">
-                    <FaUsers />
-                    Event Attendees
-                  </h3>
-                  <p className="text-base-content/70 mt-1">
-                    Showing RSVPs for "<strong>{selectedEvent}</strong>"
-                  </p>
-                </div>
-                {eventAttendees.length > 0 && (
-                  <button
-                    className="btn btn-success gap-2"
-                    onClick={handleExportAttendees}
-                  >
-                    <FaDownload />
-                    Export to Excel
-                  </button>
-                )}
-              </div>
-              
-              {eventAttendees.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="table table-zebra w-full">
-                    <thead>
-                      <tr className="bg-base-200">
-                        <th className="font-bold">Name</th>
-                        <th className="font-bold">RSVP Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {eventAttendees.map((attendee, index) => (
-                        <tr key={index}>
-                          <td className="font-semibold">{attendee.userName}</td>
-                          <td>{new Date(attendee.rsvpDate).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <FaUsers className="text-6xl text-base-content/20 mx-auto mb-4" />
-                  <p className="text-base-content/60 text-lg">No attendees have RSVP'd for this event yet.</p>
-                </div>
-              )}
-              
-              <div className="modal-action">
-                <button 
-                  className="btn btn-primary"
-                  onClick={() => setShowAttendeesModal(false)}
-                >
-                  Close
-                </button>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* ── Attendees Modal ── */}
+      {showAttendeesModal && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-2xl border border-base-300">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg">Attendees — {selectedEvent}</h3>
+              <button
+                className="btn btn-sm btn-ghost btn-circle"
+                onClick={() => setShowAttendeesModal(false)}
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            {eventAttendees.length === 0 ? (
+              <p className="text-base-content/50 font-mono text-sm text-center py-6">// no attendees yet</p>
+            ) : (
+              <>
+                <div className="overflow-x-auto rounded-xl border border-base-300 mb-4">
+                  <table className="table table-sm">
+                    <thead className="bg-base-200">
+                      <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Major</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {eventAttendees.map((attendee, i) => (
+                        <tr key={i} className="hover">
+                          <td className="font-medium text-sm">{attendee.firstName} {attendee.lastName}</td>
+                          <td className="text-sm text-base-content/60">{attendee.email}</td>
+                          <td className="text-sm text-base-content/60">{attendee.major}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <button
+                  className="btn btn-sm btn-outline gap-2 w-full"
+                  onClick={() => exportAttendeesToExcel(eventAttendees, selectedEvent)}
+                >
+                  <FaFileExcel className="w-3.5 h-3.5" /> Export Attendees
+                </button>
+              </>
+            )}
+          </div>
+          <div className="modal-backdrop" onClick={() => setShowAttendeesModal(false)} />
+        </div>
+      )}
+
+      {/* ── Edit Event Modal ── */}
+      {showEditModal && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-lg border border-base-300">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg">Edit Event</h3>
+              <button className="btn btn-sm btn-ghost btn-circle" onClick={handleCancelEdit}>
+                <FaTimes />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-3">
+              <div className="form-control">
+                <label className="label"><span className="label-text text-sm">Event Name</span></label>
+                <input name="name" value={editFormData.name} onChange={handleEditFormChange}
+                  className="input input-bordered input-sm" required />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="form-control">
+                  <label className="label"><span className="label-text text-sm">Date</span></label>
+                  <input name="date" type="date" value={editFormData.date} onChange={handleEditFormChange}
+                    className="input input-bordered input-sm" required />
+                </div>
+                <div className="form-control">
+                  <label className="label"><span className="label-text text-sm">Time</span></label>
+                  <input name="time" value={editFormData.time} onChange={handleEditFormChange}
+                    className="input input-bordered input-sm" />
+                </div>
+              </div>
+              <div className="form-control">
+                <label className="label"><span className="label-text text-sm">Location</span></label>
+                <input name="location" value={editFormData.location} onChange={handleEditFormChange}
+                  className="input input-bordered input-sm" />
+              </div>
+              <div className="form-control">
+                <label className="label"><span className="label-text text-sm">Description</span></label>
+                <textarea name="description" value={editFormData.description} onChange={handleEditFormChange}
+                  className="textarea textarea-bordered textarea-sm h-24" />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button type="submit" className="btn btn-primary btn-sm flex-1">Save Changes</button>
+                <button type="button" className="btn btn-ghost btn-sm flex-1" onClick={handleCancelEdit}>Cancel</button>
+              </div>
+            </form>
+          </div>
+          <div className="modal-backdrop" onClick={handleCancelEdit} />
+        </div>
+      )}
     </div>
   );
 };

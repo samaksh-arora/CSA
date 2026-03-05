@@ -1,303 +1,277 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useInView } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { FaCode, FaTerminal, FaUsers, FaBriefcase, FaCalendarAlt } from 'react-icons/fa';
+import Cubes from '../components/Cubes';
+
+const WHAT_WE_DO = [
+  'Host technical workshops and coding sessions',
+  'Organize hackathons and programming competitions',
+  'Facilitate networking with software engineers and recruiters',
+  'Run resume reviews and mock interview prep',
+  'Connect students with internship and co-op opportunities',
+  'Invite industry speakers for tech talks and panels',
+];
+
+const VALUES = [
+  {
+    icon: FaCode,
+    title: 'Technical Excellence',
+    description: 'We push each other to write better code, think deeper, and solve harder problems.',
+  },
+  {
+    icon: FaTerminal,
+    title: 'Curiosity First',
+    description: 'Great engineers never stop learning. We cultivate a culture of exploration and experimentation.',
+  },
+  {
+    icon: FaUsers,
+    title: 'Inclusive Community',
+    description: 'Whether you are a freshman or a senior, a beginner or an expert, you belong here.',
+  },
+];
+
+const BENEFITS = [
+  {
+    icon: FaCalendarAlt,
+    title: 'Exclusive Events',
+    description: 'Member-only workshops, hackathons, and networking nights',
+    link: '/events',
+  },
+  {
+    icon: FaBriefcase,
+    title: 'Career Resources',
+    description: 'Job postings, resume reviews, and internship referrals',
+    link: '/profile',
+  },
+  {
+    icon: FaUsers,
+    title: 'Member Network',
+    description: 'Connect with peers, alumni, and industry professionals',
+    link: '/members',
+  },
+];
 
 const About = () => {
-  const { currentUser, userRole } = useAuth();
-  const missionRef = useRef(null);
-  const valuesRef = useRef(null);
-  const benefitsRef = useRef(null);
-
-  const missionInView = useInView(missionRef, { once: true, margin: '-100px' });
-  const valuesInView = useInView(valuesRef, { once: true, margin: '-100px' });
-  const benefitsInView = useInView(benefitsRef, { once: true, margin: '-100px' });
-
-  const fadeIn = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
+  const { currentUser } = useAuth();
 
   return (
+    <div className="bg-base-100">
+
+      {/* ── Hero ── */}
+      <section className="relative min-h-[55vh] flex items-center justify-center overflow-hidden bg-base-200">
+        {/* Grid texture */}
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: `
+              linear-gradient(var(--color-base-content, #000) 1px, transparent 1px),
+              linear-gradient(90deg, var(--color-base-content, #000) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+            maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 80%)',
+            opacity: 0.06,
+          }}
+        />
+
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-4">
+            // about us
+          </span>
+          <h1 className="text-5xl md:text-7xl font-bold text-base-content mb-6 leading-tight tracking-tight">
+            Computer Science<br />
+            <span className="text-primary">Association</span>
+          </h1>
+          <p className="text-lg md:text-xl text-base-content/70 max-w-2xl mx-auto font-light">
+            Wayne State University's home for developers, builders, and problem solvers.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Who We Are ── */}
+      {/* ── Who We Are ── */}
+<section className="container mx-auto px-4 sm:px-6 py-20 max-w-6xl">
+  <div className="grid md:grid-cols-2 gap-16 items-stretch">
+    {/* Text */}
     <div>
-      {/* Hero Section */}
-      <motion.div
-        className="relative min-h-[60vh] flex items-center justify-center overflow-hidden"
-        style={{
-          backgroundImage: 'url(https://i.postimg.cc/9fNC8gQR/Header-About-Us.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/40" />
-        <div className="relative z-10 text-center px-4">
-          <motion.h1
-            className="text-6xl md:text-7xl font-bold text-white mb-6"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            About <span className="text-secondary">GSCMA</span>
-          </motion.h1>
-          <motion.p
-            className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            Wayne State University's premier organization for future supply chain leaders
-          </motion.p>
-        </div>
-      </motion.div>
+      <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-3">
+        // who we are
+      </span>
+      <h2 className="text-3xl sm:text-4xl font-bold text-base-content mb-6">
+        Built by students,<br />for students
+      </h2>
+      <p className="text-base-content/70 text-lg leading-relaxed mb-4">
+        CSA is a student-led organization open to all Wayne State students with a passion for
+        technology — whether you are studying Computer Science, Engineering, Business, or anything else.
+      </p>
+      <p className="text-base-content/70 text-lg leading-relaxed">
+        We bridge the gap between classroom theory and real-world engineering by creating
+        opportunities to build, collaborate, and grow alongside a community that shares your drive.
+      </p>
+    </div>
 
-      {/* Mission Section */}
-      <div ref={missionRef} className="container mx-auto px-4 py-20">
-        <motion.div
-          className="max-w-6xl mx-auto"
-          initial="hidden"
-          animate={missionInView ? 'visible' : 'hidden'}
-          variants={staggerContainer}
-        >
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
-            <motion.div variants={fadeIn}>
-              <div className="relative">
-                <img
-                  src="https://i.postimg.cc/zDggbpT5/All-About-US.jpg"
-                  alt="GSCMA Team"
-                  className="rounded-3xl shadow-2xl"
-                />
-                <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/20 rounded-3xl -z-10" />
-              </div>
-            </motion.div>
+    {/* Cubes animation */}
+    <div className="rounded-2xl overflow-hidden border border-base-300 min-h-[400px] [&>div]:!w-full [&>div]:!aspect-auto [&>div]:!h-full">
+      <Cubes
+        gridSize={11}
+        maxAngle={45}
+        radius={3}
+        borderStyle="2px dashed oklch(var(--p))"
+        faceColor="oklch(var(--b2))"
+        rippleColor="oklch(var(--p))"
+        rippleSpeed={1.5}
+        autoAnimate
+        rippleOnClick
+      />
+    </div>
+  </div>
+</section>
 
-            <motion.div variants={fadeIn}>
-              <h2 className="text-4xl font-bold mb-6 text-base-content">Who We Are</h2>
-              <p className="text-lg text-base-content/80 mb-4 leading-relaxed">
-               GSCMA is a student-led organization for global supply chain management undergraduates, 
-               MBA students and other interested Wayne State students
+
+      {/* ── What We Do ── */}
+      <section className="bg-base-200 py-20">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+          <div className="grid md:grid-cols-2 gap-16 items-start">
+            <div>
+              <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-3">
+                // what we do
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-base-content mb-4">
+                More than a club
+              </h2>
+              <p className="text-base-content/70 text-lg leading-relaxed">
+                We run a full calendar of technical and professional events designed to make you
+                a stronger engineer and a more confident job candidate.
               </p>
-              <p className="text-lg text-base-content/80 leading-relaxed">
-                Founded by students passionate about logistics, operations, and global trade, we provide
-                a platform for networking, professional development, and industry engagement.
-              </p>
-            </motion.div>
+            </div>
+
+            <ul className="space-y-3">
+              {WHAT_WE_DO.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-4 p-4 bg-base-100 rounded-xl border border-base-300 hover:border-primary hover:bg-primary/5 transition-all group"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 group-hover:scale-125 transition-transform" />
+                  <span className="text-base-content/80 text-sm sm:text-base">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div variants={fadeIn} className="order-2 md:order-1">
-              <h2 className="text-4xl font-bold mb-6 text-base-content">What We Do</h2>
-              <div className="space-y-4">
-                {[
-                  { icon: '-', text: 'Host industry speakers and panel discussions' },
-                  { icon: '-', text: 'Organize company tours and site visits' },
-                  { icon: '-', text: 'Facilitate networking events with professionals' },
-                  { icon: '-', text: 'Provide career development workshops' },
-                  { icon: '-', text: 'Connect students with internship opportunities' },
-                  { icon: '-', text: 'Compete in supply chain case competitions' },
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    className="flex items-center gap-4 p-4 bg-base-100 rounded-xl hover:bg-primary/5 transition-colors"
-                    whileHover={{ x: 10 }}
-                  >
-                    <span className="text-3xl">{item.icon}</span>
-                    <span className="text-lg">{item.text}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn} className="order-1 md:order-2">
-              <div className="relative max-w-2xl">
-                <img
-                  src="https://i.postimg.cc/5NCvjMR7/ABOUT-US.jpg"
-                  alt="Events"
-                  className="rounded-3xl shadow-2xl w-full"
-                />
-                <div className="absolute -top-6 -left-6 w-32 h-32 bg-secondary/20 rounded-3xl -z-10" />
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Values Section */}
-      <div ref={valuesRef} className="bg-gradient-to-b from-base-100 to-primary/5 py-20">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="max-w-6xl mx-auto text-center mb-12"
-            initial={{ opacity: 0, y: 30 }}
-            animate={valuesInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl font-bold mb-4">Our Core Values</h2>
-            <p className="text-lg text-base-content/70">What drives us forward</p>
-          </motion.div>
-
-          <motion.div
-            className="grid md:grid-cols-3 gap-8"
-            variants={staggerContainer}
-            initial="hidden"
-            animate={valuesInView ? 'visible' : 'hidden'}
-          >
-            {[
-              {
-                title: 'Excellence',
-                description: 'Striving for the highest standards in supply chain education and practice',
-                icon: '⭐',
-              },
-              {
-                title: 'Innovation',
-                description: 'Embracing new ideas and technologies shaping the future of supply chains',
-                icon: '💡',
-              },
-              {
-                title: 'Community',
-                description: 'Building lasting connections between students, alumni, and industry leaders',
-                icon: '🌍',
-              },
-            ].map((value, index) => (
-              <motion.div key={index} variants={fadeIn} whileHover={{ y: -10 }}>
-                <div className="bg-base-100 rounded-2xl p-8 shadow-xl border-2 border-base-300 hover:border-primary transition-all h-full">
-                  <div className="text-5xl mb-4">{value.icon}</div>
-                  <h3 className="text-2xl font-bold mb-3">{value.title}</h3>
-                  <p className="text-base-content/70">{value.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
-      </div>
+      </section>
 
-      {/* Member Benefits - Only for logged-in users */}
+      {/* ── Core Values ── */}
+      <section className="container mx-auto px-4 sm:px-6 py-20 max-w-6xl">
+        <div className="text-center mb-12">
+          <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-3">
+            // core values
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-bold text-base-content">
+            What drives us
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {VALUES.map(({ icon: Icon, title, description }) => (
+            <div
+              key={title}
+              className="bg-base-100 border border-base-300 hover:border-primary rounded-2xl p-8 transition-all hover:-translate-y-1 duration-300"
+            >
+              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
+                <Icon className="w-5 h-5 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-base-content mb-3">{title}</h3>
+              <p className="text-base-content/65 leading-relaxed text-sm">{description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Member Benefits (logged-in only) ── */}
       {currentUser && (
-        <div ref={benefitsRef} className="container mx-auto px-4 py-20">
-          <motion.div
-            className="max-w-6xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            animate={benefitsInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-4xl font-bold text-center mb-12">Your Member Benefits</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  ),
-                  title: 'Exclusive Events',
-                  description: 'Member-only workshops and networking events',
-                  link: '/events',
-                },
-                {
-                  icon: (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0h2a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h2"
-                    />
-                  ),
-                  title: 'Career Resources',
-                  description: 'Job postings and internship opportunities',
-                  link: '/profile',
-                },
-                {
-                  icon: (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  ),
-                  title: 'Network Access',
-                  description: 'Connect with alumni and professionals',
-                  link: '/members',
-                },
-              ].map((benefit, index) => (
-                <motion.div key={index} whileHover={{ scale: 1.05 }}>
-                  <Link to={benefit.link}>
-                    <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8 text-center border-2 border-primary/20 hover:border-primary transition-all h-full">
-                      <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          {benefit.icon}
-                        </svg>
-                      </div>
-                      <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
-                      <p className="text-sm text-base-content/70">{benefit.description}</p>
+        <section className="bg-base-200 py-20">
+          <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
+            <div className="text-center mb-12">
+              <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-3">
+                // members only
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-base-content">
+                Your member benefits
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {BENEFITS.map(({ icon: Icon, title, description, link }) => (
+                <Link to={link} key={title} className="group block">
+                  <div className="bg-base-100 border-2 border-base-300 group-hover:border-primary rounded-2xl p-8 transition-all h-full group-hover:-translate-y-1 duration-300">
+                    <div className="w-12 h-12 bg-primary/10 group-hover:bg-primary/20 rounded-xl flex items-center justify-center mb-5 transition-colors">
+                      <Icon className="w-5 h-5 text-primary" />
                     </div>
-                  </Link>
-                </motion.div>
+                    <h3 className="text-xl font-bold text-base-content mb-2">{title}</h3>
+                    <p className="text-base-content/65 text-sm leading-relaxed mb-4">{description}</p>
+                    <span className="text-primary text-sm font-semibold group-hover:underline">
+                      Explore →
+                    </span>
+                  </div>
+                </Link>
               ))}
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </section>
       )}
 
-      {/* CTA Section */}
-      <div className="bg-gradient-to-r from-primary to-secondary py-20">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="max-w-4xl mx-auto text-center text-white"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            {currentUser ? (
-              <>
-                <h2 className="text-4xl font-bold mb-6">Ready to Get Involved?</h2>
-                <p className="text-xl mb-8 text-white/90">
-                  Make the most of your GSCMA membership and unlock exclusive opportunities
-                </p>
-                <div className="flex flex-wrap justify-center gap-4">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Link to="/events" className="btn btn-lg bg-white text-primary hover:bg-white/90 border-none">
-                      View Events →
-                    </Link>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Link to="/members" className="btn btn-lg btn-outline border-white text-white hover:bg-white hover:text-primary">
-                      Connect Now
-                    </Link>
-                  </motion.div>
-                </div>
-              </>
-            ) : (
-              <>
-                <h2 className="text-4xl font-bold mb-6">Join Our Community Today</h2>
-                <p className="text-xl mb-8 text-white/90">
-                  Whether you're studying supply chain, business, or engineering—GSCMA welcomes all Wayne State students
-                </p>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link to="/join" className="btn btn-lg bg-white text-primary hover:bg-white/90 border-none">
-                    Become a Member →
-                  </Link>
-                </motion.div>
-              </>
-            )}
-          </motion.div>
+      {/* ── CTA ── */}
+      <section className="py-24 bg-primary">
+        <div className="container mx-auto px-4 text-center max-w-3xl">
+          {currentUser ? (
+            <>
+              <p className="text-xs font-mono uppercase tracking-widest text-primary-content/60 mb-4">
+                // you're in
+              </p>
+              <h2 className="text-4xl font-bold text-primary-content mb-6">
+                Ready to get involved?
+              </h2>
+              <p className="text-primary-content/80 text-lg mb-10">
+                Make the most of your membership — explore upcoming events and connect with the community.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Link
+                  to="/events"
+                  className="btn btn-lg bg-primary-content text-primary hover:bg-primary-content/90 border-none font-semibold"
+                >
+                  View Events
+                </Link>
+                <Link
+                  to="/members"
+                  className="btn btn-lg btn-outline border-primary-content text-primary-content hover:bg-primary-content hover:text-primary font-semibold"
+                >
+                  Member Directory
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-xs font-mono uppercase tracking-widest text-primary-content/60 mb-4">
+                // join us
+              </p>
+              <h2 className="text-4xl font-bold text-primary-content mb-6">
+                Ready to start building?
+              </h2>
+              <p className="text-primary-content/80 text-lg mb-10">
+                All Wayne State students are welcome — no experience required, just curiosity and drive.
+              </p>
+              <Link
+                to="/join"
+                className="btn btn-lg bg-primary-content text-primary hover:bg-primary-content/90 border-none font-semibold"
+              >
+                Become a Member
+              </Link>
+            </>
+          )}
         </div>
-      </div>
+      </section>
+
     </div>
   );
 };

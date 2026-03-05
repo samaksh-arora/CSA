@@ -1,159 +1,143 @@
 import React from 'react';
-import { FaLinkedin, FaInstagram, FaEnvelope } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import { FaLinkedin, FaInstagram, FaEnvelope, FaDiscord, FaGithub } from 'react-icons/fa';
+
+const SOCIALS = [
+  {
+    icon: FaEnvelope,
+    title: 'Email',
+    description: "Reach out directly and we'll get back to you within 24 hours.",
+    handle: 'csa.wsu@gmail.com',
+    href: 'mailto:csa.wsu@gmail.com',
+    color: 'primary',
+  },
+  {
+    icon: FaDiscord,
+    title: 'Discord',
+    description: 'Join our server for real-time announcements, help channels, and community chat.',
+    handle: 'discord.gg/wsu-csa',
+    href: 'https://discord.gg/wsu-csa',
+    color: 'secondary',
+  },
+  {
+    icon: FaLinkedin,
+    title: 'LinkedIn',
+    description: 'Follow us for job postings, member spotlights, and professional updates.',
+    handle: '@WSU-CSA',
+    href: 'https://linkedin.com',
+    color: 'accent',
+  },
+  {
+    icon: FaInstagram,
+    title: 'Instagram',
+    description: 'See event recaps, hackathon highlights, and behind-the-scenes content.',
+    handle: '@wsu_csa',
+    href: 'https://instagram.com/wsu_csa',
+    color: 'info',
+  },
+  {
+    icon: FaGithub,
+    title: 'GitHub',
+    description: 'Explore our open-source club projects and contribute to the codebase.',
+    handle: 'github.com/wsu-csa',
+    href: 'https://github.com',
+    color: 'primary',
+  },
+];
 
 const Contact = () => {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 },
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200">
-      {/* Hero Section */}
-      <motion.div
-        className="container mx-auto px-4 py-20 text-center"
-        initial="hidden"
-        animate="visible"
-        variants={fadeIn}
-        transition={{ duration: 0.8 }}
-      >
-        <h1 className="text-6xl font-bold mb-6">Get In Touch</h1>
-        <p className="text-xl text-base-content/70 max-w-2xl mx-auto">
-          Connect with GSCMA and stay updated on supply chain events, opportunities, and community news
-        </p>
-      </motion.div>
+    <div className="min-h-screen bg-base-100">
 
-      {/* Contact Cards */}
-      <div className="container mx-auto px-4 pb-20">
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {/* Email Card */}
-          <motion.a
-            href="mailto:gscma.wsu@gmail.com"
-            className="card bg-base-100 shadow-xl border-2 border-base-300 hover:border-primary cursor-pointer"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            whileHover={{ 
-              y: -8,
-              scale: 1.02,
-              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              transition: { duration: 0.2, ease: "easeOut" }
-            }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className="card-body items-center text-center">
-              <motion.div 
-                className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-4"
-                whileHover={{ rotate: 360, transition: { duration: 0.5 } }}
-              >
-                <FaEnvelope className="w-10 h-10 text-primary" />
-              </motion.div>
-              <h3 className="card-title text-2xl mb-2">Email Us</h3>
-              <p className="text-base-content/70 mb-4">
-                Send us an email and we'll get back to you soon
-              </p>
-              <p className="text-primary font-semibold"> gscma.wsu@gmail.com</p>
-            </div>
-          </motion.a>
+      {/* ── Hero ── */}
+      <section className="bg-base-200 border-b border-base-300 py-20">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl text-center">
+          <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-4">
+            // contact
+          </span>
+          <h1 className="text-5xl sm:text-6xl font-bold text-base-content mb-5 tracking-tight">
+            Get In Touch
+          </h1>
+          <p className="text-lg sm:text-xl text-base-content/65 max-w-xl mx-auto">
+            Have a question, want to collaborate, or just want to say hello? We're always happy to hear from fellow developers.
+          </p>
+        </div>
+      </section>
 
-          {/* LinkedIn Card */}
-          <motion.a
-            href="https://www.linkedin.com/groups/6572845/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="card bg-base-100 shadow-xl border-2 border-base-300 hover:border-secondary cursor-pointer"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            whileHover={{ 
-              y: -8,
-              scale: 1.02,
-              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              transition: { duration: 0.2, ease: "easeOut" }
-            }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className="card-body items-center text-center">
-              <motion.div 
-                className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mb-4"
-                whileHover={{ rotate: 360, transition: { duration: 0.5 } }}
-              >
-                <FaLinkedin className="w-10 h-10 text-secondary" />
-              </motion.div>
-              <h3 className="card-title text-2xl mb-2">LinkedIn</h3>
-              <p className="text-base-content/70 mb-4">
-                Connect with us professionally and see career opportunities
-              </p>
-              <p className="text-secondary font-semibold">@GSCMA</p>
-            </div>
-          </motion.a>
-
-          {/* Instagram Card */}
-          <motion.a
-            href="https://instagram.com/wsu_gscma"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="card bg-base-100 shadow-xl border-2 border-base-300 hover:border-accent cursor-pointer"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            whileHover={{ 
-              y: -8,
-              scale: 1.02,
-              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              transition: { duration: 0.2, ease: "easeOut" }
-            }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className="card-body items-center text-center">
-              <motion.div 
-                className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mb-4"
-                whileHover={{ rotate: 360, transition: { duration: 0.5 } }}
-              >
-                <FaInstagram className="w-10 h-10 text-accent" />
-              </motion.div>
-              <h3 className="card-title text-2xl mb-2">Instagram</h3>
-              <p className="text-base-content/70 mb-4">
-                Follow us for event photos and community highlights
-              </p>
-              <p className="text-accent font-semibold">@WSU_GSCMA</p>
-            </div>
-          </motion.a>
+      {/* ── Socials ── */}
+      <section className="container mx-auto px-4 sm:px-6 py-20 max-w-5xl">
+        <div className="text-center mb-12">
+          <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-3">
+            // find us here
+          </span>
+          <h2 className="text-3xl font-bold text-base-content">Connect With Us</h2>
         </div>
 
-        {/* Additional Info Section */}
-        <motion.div
-          className="max-w-3xl mx-auto mt-16 text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-        >
-          <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-8 border-2 border-primary/20">
-            <h3 className="text-3xl font-bold mb-4">Visit Us</h3>
-            <p className="text-lg text-base-content/80 mb-2">
-              Mike Ilitch School of Business
-            </p>
-            <p className="text-lg text-base-content/80 mb-2">
-              Wayne State University
-            </p>
-            <p className="text-lg text-base-content/80 mb-6">
-              Detroit, MI 48202
-            </p>
-            <div className="divider" />
-            <h4 className="text-xl font-bold mb-3">Office Hours</h4>
-            <p className="text-base-content/70">
-              <strong>Monday - Thursday:</strong> 2:00 PM - 5:00 PM
-            </p>
-            <p className="text-base-content/70">
-              <strong>Friday:</strong> 1:00 PM - 4:00 PM
-            </p>
-            <p className="text-base-content/70">
-              <strong>Weekend:</strong> Closed
-            </p>
-          </div>
-        </motion.div>
-      </div>
+        {/* Row 1 — 3 cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
+          {SOCIALS.slice(0, 3).map(({ icon: Icon, title, description, handle, href, color }) => (
+            <a
+              key={title}
+              href={href}
+              target={href.startsWith('mailto') ? '_self' : '_blank'}
+              rel="noopener noreferrer"
+              className="group block bg-base-100 border border-base-300 hover:border-primary rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div className={`w-12 h-12 bg-${color}/10 group-hover:bg-${color}/20 rounded-xl flex items-center justify-center mb-4 transition-colors`}>
+                <Icon className={`w-5 h-5 text-${color}`} />
+              </div>
+              <h3 className="text-lg font-bold text-base-content mb-1">{title}</h3>
+              <p className="text-sm text-base-content/60 leading-relaxed mb-4">{description}</p>
+              <span className={`text-sm font-mono font-semibold text-${color} group-hover:underline`}>
+                {handle} →
+              </span>
+            </a>
+          ))}
+        </div>
+
+        {/* Row 2 — 2 cards centered */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
+          {SOCIALS.slice(3).map(({ icon: Icon, title, description, handle, href, color }) => (
+            <a
+              key={title}
+              href={href}
+              target={href.startsWith('mailto') ? '_self' : '_blank'}
+              rel="noopener noreferrer"
+              className="group block bg-base-100 border border-base-300 hover:border-primary rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div className={`w-12 h-12 bg-${color}/10 group-hover:bg-${color}/20 rounded-xl flex items-center justify-center mb-4 transition-colors`}>
+                <Icon className={`w-5 h-5 text-${color}`} />
+              </div>
+              <h3 className="text-lg font-bold text-base-content mb-1">{title}</h3>
+              <p className="text-sm text-base-content/60 leading-relaxed mb-4">{description}</p>
+              <span className={`text-sm font-mono font-semibold text-${color} group-hover:underline`}>
+                {handle} →
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="py-20 bg-primary">
+        <div className="container mx-auto px-4 text-center max-w-2xl">
+          <p className="text-xs font-mono uppercase tracking-widest text-primary-content/60 mb-4">
+            // ready to build?
+          </p>
+          <h2 className="text-4xl font-bold text-primary-content mb-5">
+            Join the community
+          </h2>
+          <p className="text-primary-content/80 mb-8 text-lg">
+            Whether you have a question or just want to get involved — we'd love to hear from you.
+          </p>
+          <a
+            href="mailto:csa.wsu@gmail.com"
+            className="btn btn-lg bg-primary-content text-primary hover:bg-primary-content/90 border-none font-semibold"
+          >
+            Send Us an Email
+          </a>
+        </div>
+      </section>
+
     </div>
   );
 };

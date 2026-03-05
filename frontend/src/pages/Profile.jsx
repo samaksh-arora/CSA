@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaUser, FaEnvelope, FaGraduationCap, FaPhone, FaCalendarCheck, FaEdit, FaTimes } from 'react-icons/fa';
+import {
+  FaCalendarAlt, FaClock, FaMapMarkerAlt, FaUser, FaEnvelope,
+  FaGraduationCap, FaPhone, FaEdit, FaTimes, FaCode, FaCalendarCheck
+} from 'react-icons/fa';
 
 const Profile = () => {
   const { currentUser, getToken } = useAuth();
@@ -11,8 +14,6 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [error, setError] = useState(null);
-  
-  // Edit profile state
   const [showEditModal, setShowEditModal] = useState(false);
   const [editFormData, setEditFormData] = useState({
     firstName: '',
@@ -22,7 +23,6 @@ const Profile = () => {
     graduationYear: ''
   });
 
-  // Fetch user profile data
   useEffect(() => {
     if (currentUser) {
       fetchUserData();
@@ -37,39 +37,15 @@ const Profile = () => {
     try {
       setLoading(true);
       setError(null);
-      
       const token = await getToken();
-      if (!token) {
-        throw new Error('No authentication token available');
-      }
-
-      console.log('Fetching user data with token:', token.substring(0, 20) + '...');
-      
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/users/me`,
-        { 
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          } 
-        }
-      );
-      
-      console.log('User data response:', response.data);
+      if (!token) throw new Error('No authentication token available');
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+      });
       setUserData(response.data);
     } catch (error) {
-      console.error('Error fetching user ', error);
-      if (error.response) {
-        console.error('Response ', error.response.data);
-        console.error('Response status:', error.response.status);
-        setError(`Server error: ${error.response.data.error || error.response.statusText}`);
-      } else if (error.request) {
-        console.error('No response received:', error.request);
-        setError('No response from server. Make sure the backend is running.');
-      } else {
-        console.error('Error message:', error.message);
-        setError(error.message);
-      }
+      console.error('Error fetching user', error);
+      setError(error.response?.data?.error || error.message || 'Failed to load profile');
     } finally {
       setLoading(false);
     }
@@ -78,24 +54,11 @@ const Profile = () => {
   const fetchUserRsvps = async () => {
     try {
       setLoadingEvents(true);
-      const token = await getToken();
-      
-      // Fetch all events
-      const eventsResponse = await axios.get(
-        `${import.meta.env.VITE_API_URL}/events`
+      const eventsResponse = await axios.get(`${import.meta.env.VITE_API_URL}/events`);
+      const userRsvpEvents = eventsResponse.data.filter(event =>
+        event.attendees?.some(a => a.userId === currentUser?.uid)
       );
-      
-      // Filter events where current user has RSVP'd
-      const userRsvpEvents = eventsResponse.data.filter(event => 
-        event.attendees?.some(attendee => attendee.userId === currentUser?.uid)
-      );
-      
-      // Sort by date (upcoming first)
-      const sortedEvents = userRsvpEvents.sort((a, b) => 
-        new Date(a.date) - new Date(b.date)
-      );
-      
-      setRsvpEvents(sortedEvents);
+      setRsvpEvents(userRsvpEvents.sort((a, b) => new Date(a.date) - new Date(b.date)));
     } catch (error) {
       console.error('Error fetching RSVP events:', error);
     } finally {
@@ -103,7 +66,6 @@ const Profile = () => {
     }
   };
 
-  // Edit Profile Functions
   const handleEditClick = () => {
     setEditFormData({
       firstName: userData.firstName,
@@ -117,383 +79,375 @@ const Profile = () => {
 
   const handleEditFormChange = (e) => {
     const { name, value } = e.target;
-    setEditFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setEditFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
-    
     try {
       const token = await getToken();
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/users/me`,
-        editFormData,
-        { 
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          } 
-        }
-      );
-      
-      alert('Profile updated successfully!');
+      await axios.put(`${import.meta.env.VITE_API_URL}/users/me`, editFormData, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+      });
       setShowEditModal(false);
-      fetchUserData(); // Refresh user data
+      fetchUserData();
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Failed to update profile. Please try again.');
     }
   };
 
   const handleCancelEdit = () => {
     setShowEditModal(false);
-    setEditFormData({
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      major: '',
-      graduationYear: ''
-    });
+    setEditFormData({ firstName: '', lastName: '', phoneNumber: '', major: '', graduationYear: '' });
   };
 
+  // ── Loading ──
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center min-h-screen bg-base-100">
         <div className="text-center">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-          <p className="mt-4 text-base-content/70">Loading profile...</p>
+          <span className="loading loading-spinner loading-lg text-primary" />
+          <p className="mt-4 text-base-content/60 font-mono text-sm">// loading profile...</p>
         </div>
       </div>
     );
   }
 
+  // ── Error ──
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <div className="alert alert-error max-w-md mx-auto shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <h3 className="font-bold">Profile Error</h3>
-            <div className="text-xs">{error}</div>
+      <div className="flex justify-center items-center min-h-screen bg-base-100 px-4">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-error/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <FaUser className="w-7 h-7 text-error" />
           </div>
+          <h2 className="text-xl font-bold text-base-content mb-2">Profile Error</h2>
+          <p className="text-base-content/60 text-sm mb-6">{error}</p>
+          <button className="btn btn-primary rounded-full px-8" onClick={fetchUserData}>
+            Retry
+          </button>
         </div>
-        <button 
-          className="btn btn-primary mt-4" 
-          onClick={fetchUserData}
-        >
-          Retry
-        </button>
       </div>
     );
   }
 
-  if (!userData) {
-    return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <div className="alert alert-warning max-w-md mx-auto shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
-          <div>
-            <h3 className="font-bold">No Profile Data</h3>
-            <div className="text-xs">Unable to load profile information.</div>
-          </div>
-        </div>
-        <button 
-          className="btn btn-primary mt-4" 
-          onClick={fetchUserData}
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
+  if (!userData) return null;
+
+  const memberSince = new Date(userData.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long'
+  });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200 py-12">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-5xl font-bold mb-2">My Profile</h1>
-            <p className="text-base-content/60">Manage your GSCMA membership details</p>
-          </div>
+    <div className="bg-base-100 min-h-screen">
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Profile Card */}
-            <div className="md:col-span-1">
-              <div className="card bg-base-100 shadow-xl border border-base-300">
-                <figure className="px-10 pt-10">
-                  <div className="avatar">
-                    <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                      <img
-                        src={`https://ui-avatars.com/api/?name=${userData.firstName}+${userData.lastName}&size=200&background=4ade80&color=ffffff`}
-                        alt="Profile"
-                      />
-                    </div>
-                  </div>
-                </figure>
-                <div className="card-body items-center text-center">
-                  <h2 className="card-title text-2xl">{userData.firstName} {userData.lastName}</h2>
-                  <div className="badge badge-primary badge-lg">{userData.role}</div>
-                  {userData.paymentStatus && (
-                    <div className={`badge badge-lg ${userData.paymentStatus === 'paid' ? 'badge-success' : 'badge-warning'}`}>
-                      {userData.paymentStatus === 'paid' ? 'Dues Paid ✓' : 'Dues Pending'}
-                    </div>
-                  )}
-                  <div className="divider"></div>
-                  <div className="stats stats-vertical shadow w-full">
-                    <div className="stat place-items-center">
-                      <div className="stat-title">Events RSVP'd</div>
-                      <div className="stat-value text-primary">{rsvpEvents.length}</div>
-                    </div>
-                  </div>
-                </div>
+      {/* ── Hero Banner ── */}
+      <div className="bg-base-200 border-b border-base-300">
+        <div className="container mx-auto px-4 sm:px-6 py-12 max-w-6xl">
+          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6">
+            {/* Avatar */}
+            <div className="relative shrink-0">
+              <div className="w-24 h-24 rounded-2xl overflow-hidden border-4 border-base-100 shadow-xl">
+                <img
+                  src={`https://ui-avatars.com/api/?name=${userData.firstName}+${userData.lastName}&size=200&background=random&color=ffffff&bold=true`}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+             
+            </div>
+
+            {/* Name + meta */}
+            <div className="text-center sm:text-left flex-1">
+              <span className="text-xs font-mono uppercase tracking-widest text-primary mb-1 block">
+                // member profile
+              </span>
+              <h1 className="text-3xl sm:text-4xl font-bold text-base-content tracking-tight">
+                {userData.firstName} {userData.lastName}
+              </h1>
+              <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
+                <span className="badge badge-primary">{userData.role}</span>
+        
+                {userData.major && (
+                  <span className="badge badge-ghost">{userData.major}</span>
+                )}
               </div>
             </div>
 
-            {/* Profile Information */}
-            <div className="md:col-span-2 space-y-6">
-              {/* Personal Info Card */}
-              <div className="card bg-base-100 shadow-xl border border-base-300">
-                <div className="card-body">
-                  <h2 className="card-title text-2xl mb-6 flex items-center gap-2">
-                    <FaUser className="text-primary" />
-                    Personal Information
-                  </h2>
-                  
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-base-content/60">
-                        <FaEnvelope className="text-primary" />
-                        Email
-                      </div>
-                      <p className="text-lg pl-6">{userData.email}</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-base-content/60">
-                        <FaPhone className="text-primary" />
-                        Phone Number
-                      </div>
-                      <p className="text-lg pl-6">{userData.phoneNumber}</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-base-content/60">
-                        <FaGraduationCap className="text-primary" />
-                        Major
-                      </div>
-                      <p className="text-lg pl-6">{userData.major}</p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-base-content/60">
-                        <FaCalendarCheck className="text-primary" />
-                        Graduation Year
-                      </div>
-                      <p className="text-lg pl-6">{userData.graduationYear}</p>
-                    </div>
-                  </div>
-
-                  <div className="divider"></div>
-
-                  <div className="space-y-2">
-                    <p className="text-sm font-semibold text-base-content/60">Member Since</p>
-                    <p className="text-lg">{new Date(userData.createdAt).toLocaleDateString('en-US', { 
-                      month: 'long', 
-                      day: 'numeric', 
-                      year: 'numeric' 
-                    })}</p>
-                  </div>
-
-                  <div className="card-actions justify-end mt-6">
-                    <button 
-                      className="btn btn-primary gap-2"
-                      onClick={handleEditClick}
-                    >
-                      <FaEdit />
-                      Edit Profile
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* My RSVPs Card */}
-              <div className="card bg-base-100 shadow-xl border border-base-300">
-                <div className="card-body">
-                  <h2 className="card-title text-2xl mb-4 flex items-center gap-2">
-                    <FaCalendarAlt className="text-primary" />
-                    My RSVPs
-                  </h2>
-                  
-                  {loadingEvents ? (
-                    <div className="flex justify-center py-8">
-                      <span className="loading loading-spinner loading-lg text-primary"></span>
-                    </div>
-                  ) : rsvpEvents.length === 0 ? (
-                    <div className="text-center py-8">
-                      <FaCalendarAlt className="text-6xl text-base-content/20 mx-auto mb-4" />
-                      <p className="text-base-content/60 mb-4">You haven't RSVP'd to any events yet.</p>
-                      <Link to="/events" className="btn btn-primary btn-sm">
-                        Browse Events
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {rsvpEvents.map((event) => (
-                        <div key={event._id} className="border border-base-300 rounded-lg p-4 hover:border-primary transition-colors">
-                          <Link to="/events">
-                            <h3 className="font-bold text-lg mb-2 text-primary hover:underline">
-                              {event.name}
-                            </h3>
-                            <div className="flex flex-wrap gap-4 text-sm text-base-content/70">
-                              <div className="flex items-center gap-1">
-                                <FaCalendarAlt className="text-secondary" />
-                                <span>{new Date(event.date).toLocaleDateString('en-US', { 
-                                  weekday: 'short', 
-                                  month: 'short', 
-                                  day: 'numeric' 
-                                })}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <FaClock className="text-secondary" />
-                                <span>{event.time}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <FaMapMarkerAlt className="text-accent" />
-                                <span>{event.location}</span>
-                              </div>
-                            </div>
-                          </Link>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            {/* Edit button */}
+            <button
+              onClick={handleEditClick}
+              className="btn btn-outline btn-sm rounded-full gap-2 shrink-0"
+            >
+              <FaEdit className="w-3 h-3" />
+              Edit Profile
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Edit Profile Modal */}
-      {showEditModal && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-2xl">
-            <h3 className="font-bold text-2xl text-primary mb-6 flex items-center gap-2">
-              <FaEdit />
-              Edit Profile
-            </h3>
-            
-            <form onSubmit={handleSaveProfile}>
+      {/* ── Main Content ── */}
+      <div className="container mx-auto px-4 sm:px-6 py-10 max-w-6xl">
+        <div className="grid lg:grid-cols-3 gap-8">
+
+          {/* ── Left Column: Info ── */}
+          <div className="lg:col-span-1 space-y-6">
+
+            {/* About Card */}
+            <div className="bg-base-200 rounded-2xl border border-base-300 p-6">
+              <span className="text-xs font-mono uppercase tracking-widest text-primary mb-4 block">
+                // about
+              </span>
               <div className="space-y-4">
-                {/* First Name & Last Name */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">First Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={editFormData.firstName}
-                      onChange={handleEditFormChange}
-                      className="input input-bordered input-primary"
-                      required
-                    />
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <FaEnvelope className="w-3.5 h-3.5 text-primary" />
                   </div>
-
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Last Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={editFormData.lastName}
-                      onChange={handleEditFormChange}
-                      className="input input-bordered input-primary"
-                      required
-                    />
+                  <div>
+                    <p className="text-xs text-base-content/50 font-medium">Email</p>
+                    <p className="text-sm text-base-content font-medium truncate">{userData.email}</p>
                   </div>
                 </div>
 
-                {/* Phone Number */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold">Phone Number</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={editFormData.phoneNumber}
-                    onChange={handleEditFormChange}
-                    className="input input-bordered input-primary"
-                    required
-                  />
-                </div>
+                {userData.phoneNumber && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                      <FaPhone className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-base-content/50 font-medium">Phone</p>
+                      <p className="text-sm text-base-content font-medium">{userData.phoneNumber}</p>
+                    </div>
+                  </div>
+                )}
 
-                {/* Major */}
+                {userData.major && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                      <FaCode className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-base-content/50 font-medium">Major</p>
+                      <p className="text-sm text-base-content font-medium">{userData.major}</p>
+                    </div>
+                  </div>
+                )}
+
+                {userData.graduationYear && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                      <FaGraduationCap className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-base-content/50 font-medium">Graduation Year</p>
+                      <p className="text-sm text-base-content font-medium">{userData.graduationYear}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <FaCalendarCheck className="w-3.5 h-3.5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-base-content/50 font-medium">Member Since</p>
+                    <p className="text-sm text-base-content font-medium">{memberSince}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Card */}
+            <div className="bg-base-200 rounded-2xl border border-base-300 p-6">
+              <span className="text-xs font-mono uppercase tracking-widest text-primary mb-4 block">
+                // stats
+              </span>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-base-100 rounded-xl p-4 border border-base-300">
+                  <p className="text-2xl font-bold text-primary">{rsvpEvents.length}</p>
+                  <p className="text-xs text-base-content/60 mt-1">Events RSVP'd</p>
+                </div>
+                <div className="bg-base-100 rounded-xl p-4 border border-base-300">
+                  <p className="text-2xl font-bold text-primary capitalize">{userData.role}</p>
+                  <p className="text-xs text-base-content/60 mt-1">Role</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* ── Right Column: RSVP'd Events ── */}
+          <div className="lg:col-span-2">
+            <div className="bg-base-200 rounded-2xl border border-base-300 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <span className="text-xs font-mono uppercase tracking-widest text-primary">
+                  // my events
+                </span>
+                <Link to="/events" className="btn btn-ghost btn-xs rounded-full text-primary">
+                  Browse All →
+                </Link>
+              </div>
+
+              {loadingEvents ? (
+                <div className="flex justify-center py-12">
+                  <span className="loading loading-spinner loading-md text-primary" />
+                </div>
+              ) : rsvpEvents.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-14 h-14 bg-base-100 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-base-300">
+                    <FaCalendarAlt className="w-6 h-6 text-base-content/30" />
+                  </div>
+                  <p className="text-base-content/60 text-sm mb-4">No events RSVP'd yet</p>
+                  <Link to="/events" className="btn btn-primary btn-sm rounded-full px-6">
+                    Explore Events
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {rsvpEvents.map(event => {
+                    const isPast = new Date(event.date) < new Date();
+                    return (
+                      <div
+                        key={event._id}
+                        className={`bg-base-100 rounded-xl border p-4 transition-all hover:border-primary group ${isPast ? 'border-base-300 opacity-60' : 'border-base-300'}`}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              {isPast ? (
+                                <span className="badge badge-ghost badge-xs">Past</span>
+                              ) : (
+                                <span className="badge badge-primary badge-xs">Upcoming</span>
+                              )}
+                            </div>
+                            <h3 className="font-semibold text-base-content text-sm truncate group-hover:text-primary transition-colors">
+                              {event.title}
+                            </h3>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                              <span className="flex items-center gap-1.5 text-xs text-base-content/60">
+                                <FaCalendarAlt className="w-3 h-3 text-primary" />
+                                {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </span>
+                              {event.time && (
+                                <span className="flex items-center gap-1.5 text-xs text-base-content/60">
+                                  <FaClock className="w-3 h-3 text-primary" />
+                                  {event.time}
+                                </span>
+                              )}
+                              {event.location && (
+                                <span className="flex items-center gap-1.5 text-xs text-base-content/60">
+                                  <FaMapMarkerAlt className="w-3 h-3 text-primary" />
+                                  {event.location}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ── Edit Modal ── */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-base-content/40 backdrop-blur-sm" onClick={handleCancelEdit} />
+          <div className="relative bg-base-100 rounded-2xl border border-base-300 shadow-2xl w-full max-w-lg p-6 z-10">
+
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-widest text-primary block mb-1">
+                  // edit profile
+                </span>
+                <h3 className="text-xl font-bold text-base-content">Update your info</h3>
+              </div>
+              <button onClick={handleCancelEdit} className="btn btn-ghost btn-sm btn-circle">
+                <FaTimes />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-semibold">Major</span>
+                    <span className="label-text text-xs font-medium text-base-content/70">First Name</span>
                   </label>
                   <input
                     type="text"
-                    name="major"
-                    value={editFormData.major}
+                    name="firstName"
+                    value={editFormData.firstName}
                     onChange={handleEditFormChange}
-                    className="input input-bordered input-primary"
+                    className="input input-bordered input-sm rounded-xl"
                     required
                   />
                 </div>
-
-                {/* Graduation Year */}
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-semibold">Graduation Year</span>
+                    <span className="label-text text-xs font-medium text-base-content/70">Last Name</span>
                   </label>
                   <input
-                    type="number"
-                    name="graduationYear"
-                    value={editFormData.graduationYear}
+                    type="text"
+                    name="lastName"
+                    value={editFormData.lastName}
                     onChange={handleEditFormChange}
-                    className="input input-bordered input-primary"
-                    min="2020"
-                    max="2035"
+                    className="input input-bordered input-sm rounded-xl"
                     required
                   />
-                </div>
-
-                {/* Email (Read-only) */}
-                <div className="alert alert-info">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <span className="text-sm">Email address cannot be changed. Contact admin if you need to update your email.</span>
                 </div>
               </div>
 
-              <div className="modal-action">
-                <button
-                  type="button"
-                  className="btn btn-ghost gap-2"
-                  onClick={handleCancelEdit}
-                >
-                  <FaTimes />
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text text-xs font-medium text-base-content/70">Phone Number</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={editFormData.phoneNumber}
+                  onChange={handleEditFormChange}
+                  className="input input-bordered input-sm rounded-xl"
+                  placeholder="(555) 000-0000"
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text text-xs font-medium text-base-content/70">Major</span>
+                </label>
+                <input
+                  type="text"
+                  name="major"
+                  value={editFormData.major}
+                  onChange={handleEditFormChange}
+                  className="input input-bordered input-sm rounded-xl"
+                  placeholder="e.g. Computer Science"
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text text-xs font-medium text-base-content/70">Graduation Year</span>
+                </label>
+                <input
+                  type="text"
+                  name="graduationYear"
+                  value={editFormData.graduationYear}
+                  onChange={handleEditFormChange}
+                  className="input input-bordered input-sm rounded-xl"
+                  placeholder="e.g. 2026"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={handleCancelEdit} className="btn btn-ghost btn-sm flex-1 rounded-full">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary gap-2"
-                >
-                  <FaEdit />
+                <button type="submit" className="btn btn-primary btn-sm flex-1 rounded-full">
                   Save Changes
                 </button>
               </div>
@@ -501,6 +455,7 @@ const Profile = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

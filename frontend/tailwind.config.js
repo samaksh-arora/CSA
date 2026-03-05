@@ -9,7 +9,7 @@ export default {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["night --default --prefersdark"],
+    themes: ["night"],
     base: true,
     styled: true,
     utils: true,

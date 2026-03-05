@@ -2,6 +2,7 @@
 // Add emails here that should automatically get admin role
 const ADMIN_EMAILS = [
   'samaksh.arora@wayne.edu',
+  'admin@wayne.edu'
    // Add your email here
      // Add more admin emails as needed
 ];
