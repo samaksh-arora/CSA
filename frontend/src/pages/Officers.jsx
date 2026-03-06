@@ -59,7 +59,7 @@ const OFFICERS = [
   },
    {
     id: 7,
-    name: 'Shanmucka Javvaji',
+    name: 'Shanmuk Javvaji',
     position: 'Membership Chair',
     year: 'Sophomore',
     bio: 'Managing Member Data in CSA',
