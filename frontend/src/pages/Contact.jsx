@@ -6,7 +6,7 @@ const SOCIALS = [
     icon: FaEnvelope,
     title: 'Email',
     description: "Reach out directly and we'll get back to you within 24 hours.",
-    handle: 'csa.wsu@gmail.com',
+    handle: 'waynestatecsa@gmail.com',
     href: 'mailto:waynestatecsa@gmail.com',
     color: 'primary',
   },
