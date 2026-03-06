@@ -1,7 +1,7 @@
 {
-  "name": "gscma-backend",
+  "name": "csa-backend",
   "version": "1.0.0",
-  "description": "Backend API for GSCMA Website",
+  "description": "Backend API for CSA Website",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
