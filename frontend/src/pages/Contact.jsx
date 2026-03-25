@@ -23,7 +23,7 @@ const SOCIALS = [
     title: 'LinkedIn',
     description: 'Follow us for job postings, member spotlights, and professional updates.',
     handle: '@wayne-state-csa',
-    href: 'https://www.linkedin.com/in/wayne-state-computer-science-association-495ba93b3/',
+    href: 'https://www.linkedin.com/company/wayne-state-csa/',
     color: 'accent',
   },
   {
