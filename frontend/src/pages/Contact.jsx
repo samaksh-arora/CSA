@@ -64,7 +64,7 @@ const Contact = () => {
       </section>
 
       {/* ── Socials ── */}
-      <section className="container mx-auto px-4 sm:px-6 py-20 max-w-3xl">
+      <section className="container mx-auto px-4 sm:px-6 py-20 max-w-5xl">
         <div className="text-center mb-12">
           <span className="inline-block text-xs font-mono uppercase tracking-widest text-primary mb-3">
             // find us here
@@ -72,26 +72,50 @@ const Contact = () => {
           <h2 className="text-3xl font-bold text-base-content">Connect With Us</h2>
         </div>
 
-        {/* 2x2 Symmetrical Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {SOCIALS.map(({ icon: Icon, title, description, handle, href, color }) => (
-            <a
-              key={title}
-              href={href}
-              target={href.startsWith('mailto') ? '_self' : '_blank'}
-              rel="noopener noreferrer"
-              className="group block bg-base-100 border border-base-300 hover:border-primary rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className={`w-12 h-12 bg-${color}/10 group-hover:bg-${color}/20 rounded-xl flex items-center justify-center mb-4 transition-colors`}>
-                <Icon className={`w-5 h-5 text-${color}`} />
-              </div>
-              <h3 className="text-lg font-bold text-base-content mb-1">{title}</h3>
-              <p className="text-sm text-base-content/60 leading-relaxed mb-4">{description}</p>
-              <span className={`text-sm font-mono font-semibold text-${color} group-hover:underline`}>
-                {handle} →
-              </span>
-            </a>
-          ))}
+        {/* 3-2 Grid */}
+        <div className="flex flex-col gap-5">
+          {/* Row 1: 3 cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {SOCIALS.slice(0, 3).map(({ icon: Icon, title, description, handle, href, color }) => (
+              <a
+                key={title}
+                href={href}
+                target={href.startsWith('mailto') ? '_self' : '_blank'}
+                rel="noopener noreferrer"
+                className="group block bg-base-100 border border-base-300 hover:border-primary rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className={`w-12 h-12 bg-${color}/10 group-hover:bg-${color}/20 rounded-xl flex items-center justify-center mb-4 transition-colors`}>
+                  <Icon className={`w-5 h-5 text-${color}`} />
+                </div>
+                <h3 className="text-lg font-bold text-base-content mb-1">{title}</h3>
+                <p className="text-sm text-base-content/60 leading-relaxed mb-4">{description}</p>
+                <span className={`text-sm font-mono font-semibold text-${color} group-hover:underline`}>
+                  {handle} →
+                </span>
+              </a>
+            ))}
+          </div>
+          {/* Row 2: 2 cards centered */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:w-2/3 mx-auto">
+            {SOCIALS.slice(3).map(({ icon: Icon, title, description, handle, href, color }) => (
+              <a
+                key={title}
+                href={href}
+                target={href.startsWith('mailto') ? '_self' : '_blank'}
+                rel="noopener noreferrer"
+                className="group block bg-base-100 border border-base-300 hover:border-primary rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className={`w-12 h-12 bg-${color}/10 group-hover:bg-${color}/20 rounded-xl flex items-center justify-center mb-4 transition-colors`}>
+                  <Icon className={`w-5 h-5 text-${color}`} />
+                </div>
+                <h3 className="text-lg font-bold text-base-content mb-1">{title}</h3>
+                <p className="text-sm text-base-content/60 leading-relaxed mb-4">{description}</p>
+                <span className={`text-sm font-mono font-semibold text-${color} group-hover:underline`}>
+                  {handle} →
+                </span>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
