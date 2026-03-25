@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaLinkedin, FaInstagram, FaEnvelope, FaDiscord, FaGithub } from 'react-icons/fa';
+import { FaLinkedin, FaInstagram, FaEnvelope, FaDiscord, FaGithub, FaUsers } from 'react-icons/fa';
 
 const SOCIALS = [
   {
@@ -33,6 +33,14 @@ const SOCIALS = [
     handle: '@wsu_csa',
     href: 'https://instagram.com/wsu_csa',
     color: 'info',
+  },
+  {
+    icon: FaUsers,
+    title: 'GroupMe',
+    description: 'Join our GroupMe chat to stay connected with members and get instant updates.',
+    handle: 'Join our GroupMe',
+    href: 'https://groupme.com/join_group/113605752/pG84Dhmx',
+    color: 'success',
   },
 ];
 
