@@ -202,7 +202,7 @@ const Home = () => {
                           <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
                             <p className="text-xs sm:text-sm text-base-content/60 flex items-start gap-2">
                               <span className="shrink-0">📅</span>
-                              <span>{event.date ? new Date(event.date).toLocaleDateString() : ''} • {event.time}</span>
+                              <span>{event.date ? new Date(event.date.slice(0, 10).replace(/-/g, '/')).toLocaleDateString() : ''} • {event.time}</span>
                             </p>
                             <p className="text-xs sm:text-sm text-base-content/60 flex items-start gap-2">
                               <span className="shrink-0">📍</span>
