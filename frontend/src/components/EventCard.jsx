@@ -72,9 +72,9 @@ const EventCard = ({ event, isAdmin, onDelete, onEdit }) => {
                 <FaCalendarAlt className="text-primary text-sm" />
               </div>
               <span className="text-base-content/80 font-medium">
-                {new Date(event.date).toLocaleDateString('en-US', { 
-                  weekday: 'short', 
-                  month: 'short', 
+                {new Date(event.date.slice(0, 10).replace(/-/g, '/')).toLocaleDateString('en-US', {
+                  weekday: 'short',
+                  month: 'short',
                   day: 'numeric',
                   year: 'numeric'
                 })}
